@@ -1,146 +1,153 @@
 package com.pgu.client;
 
-import com.pgu.shared.FieldVerifier;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.pgu.client.app.AsyncCallbackApp;
+import com.pgu.shared.Symbol;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Pgu_languages implements EntryPoint {
-    /**
-     * The message displayed to the user when the server cannot be reached or
-     * returns an error.
-     */
-    private static final String SERVER_ERROR = "An error occurred while "
-            + "attempting to contact the server. Please check your network " + "connection and try again.";
 
-    /**
-     * Create a remote service proxy to talk to the server-side Greeting service.
-     */
-    private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
+    InitServiceAsync initService = GWT.create(InitService.class);
+    GameServiceAsync gameService = GWT.create(GameService.class);
 
-    /**
-     * This is the entry point method.
-     */
+    private static final int SIZE = 4;
+
+    @Override
     public void onModuleLoad() {
-        final Button sendButton = new Button("Send");
-        final TextBox nameField = new TextBox();
-        nameField.setText("GWT User");
-        final Label errorLabel = new Label();
 
-        // We can add style names to widgets
-        sendButton.addStyleName("sendButton");
+        final Button btnInitGame = new Button("initGame");
+        RootPanel.get().add(btnInitGame);
+        RootPanel.get().add(new HTML(""));
 
-        // Add the nameField and sendButton to the RootPanel
-        // Use RootPanel.get() to get the entire body element
-        RootPanel.get("nameFieldContainer").add(nameField);
-        RootPanel.get("sendButtonContainer").add(sendButton);
-        RootPanel.get("errorLabelContainer").add(errorLabel);
+        final Button btnDeleteData = new Button("deleteData");
+        RootPanel.get().add(btnDeleteData);
+        final Button btnInitData = new Button("initData");
+        RootPanel.get().add(btnInitData);
+        RootPanel.get().add(new HTML(""));
 
-        // Focus the cursor on the name field when the app loads
-        nameField.setFocus(true);
-        nameField.selectAll();
+        final FlexTable ft = new FlexTable();
+        RootPanel.get().add(ft);
 
-        // Create the popup dialog box
-        final DialogBox dialogBox = new DialogBox();
-        dialogBox.setText("Remote Procedure Call");
-        dialogBox.setAnimationEnabled(true);
-        final Button closeButton = new Button("Close");
-        // We can set the id of a widget by accessing its Element
-        closeButton.getElement().setId("closeButton");
-        final Label textToServerLabel = new Label();
-        final HTML serverResponseLabel = new HTML();
-        VerticalPanel dialogVPanel = new VerticalPanel();
-        dialogVPanel.addStyleName("dialogVPanel");
-        dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-        dialogVPanel.add(textToServerLabel);
-        dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-        dialogVPanel.add(serverResponseLabel);
-        dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-        dialogVPanel.add(closeButton);
-        dialogBox.setWidget(dialogVPanel);
+        int index = 0;
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
 
-        // Add a handler to close the DialogBox
-        closeButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                dialogBox.hide();
-                sendButton.setEnabled(true);
-                sendButton.setFocus(true);
-            }
-        });
+                final FlowPanelCard cellFormat = new FlowPanelCard(index++, this);
+                final Style style = cellFormat.getElement().getStyle();
+                style.setBackgroundColor("limegreen");
+                style.setWidth(25, Unit.PX);
+                style.setHeight(25, Unit.PX);
 
-        // Create a handler for the sendButton and nameField
-        class MyHandler implements ClickHandler, KeyUpHandler {
-            /**
-             * Fired when the user clicks on the sendButton.
-             */
-            public void onClick(ClickEvent event) {
-                sendNameToServer();
-            }
+                ft.setWidget(row, col, cellFormat);
 
-            /**
-             * Fired when the user types in the nameField.
-             */
-            public void onKeyUp(KeyUpEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    sendNameToServer();
-                }
-            }
-
-            /**
-             * Send the name from the nameField to the server and wait for a response.
-             */
-            private void sendNameToServer() {
-                // First, we validate the input.
-                errorLabel.setText("");
-                String textToServer = nameField.getText();
-                if (!FieldVerifier.isValidName(textToServer)) {
-                    errorLabel.setText("Please enter at least four characters");
-                    return;
-                }
-
-                // Then, we send the input to the server.
-                sendButton.setEnabled(false);
-                textToServerLabel.setText(textToServer);
-                serverResponseLabel.setText("");
-                greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-                    public void onFailure(Throwable caught) {
-                        // Show the RPC error message to the user
-                        dialogBox.setText("Remote Procedure Call - Failure");
-                        serverResponseLabel.addStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(SERVER_ERROR);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
-
-                    public void onSuccess(String result) {
-                        dialogBox.setText("Remote Procedure Call");
-                        serverResponseLabel.removeStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(result);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
-                });
             }
         }
 
-        // Add a handler to send the name to the server
-        MyHandler handler = new MyHandler();
-        sendButton.addClickHandler(handler);
-        nameField.addKeyUpHandler(handler);
+        btnInitData.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                btnInitData.setEnabled(false);
+                initService.initData(new AsyncCallbackApp<Void>() {
+
+                    @Override
+                    public void onSuccess(final Void result) {
+                        GWT.log("init is done");
+                    }
+                });
+            }
+        });
+
+        btnDeleteData.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                initService.deleteData(new AsyncCallbackApp<Void>() {
+
+                    @Override
+                    public void onSuccess(final Void result) {
+                        GWT.log("clean data is done");
+                    }
+                });
+            }
+        });
+
+        btnInitGame.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                gameService.initGame(new AsyncCallbackApp<List<Symbol>>() {
+
+                    @Override
+                    public void onSuccess(final List<Symbol> result) {
+                        symbols.clear();
+                        symbols.addAll(result);
+
+                        symbolGames.clear();
+                        for (int i = 0; i < SIZE * 2; i++) {
+                            symbolGames.add(symbols.get(Random.nextInt(symbols.size())));
+                        }
+
+                        int j = 0;
+                        for (int row = 0; row < SIZE / 2; row++) {
+                            for (int col = 0; col < SIZE; col++) {
+                                final FlowPanelCard fpc = (FlowPanelCard) ft.getWidget(row, col);
+                                fpc.label.setHTML(symbolGames.get(j++).getAlpha());
+                            }
+                        }
+
+                        j = 0;
+                        for (int row = SIZE / 2; row < SIZE; row++) {
+                            for (int col = 0; col < SIZE; col++) {
+                                final FlowPanelCard fpc = (FlowPanelCard) ft.getWidget(row, col);
+                                fpc.label.setHTML(symbolGames.get(j++).getUnicode());
+                            }
+                        }
+
+                    }
+                });
+            }
+        });
+
     }
+
+    List<Symbol> symbols = new ArrayList<Symbol>();
+    List<Symbol> symbolGames = new ArrayList<Symbol>();
+
+    public static class FlowPanelCard extends FlowPanel {
+
+        private final HTML label = new HTML();
+
+        public FlowPanelCard(final int index, final Pgu_languages board) {
+            add(label);
+
+            addDomHandler(new ClickHandler() {
+
+                @Override
+                public void onClick(final ClickEvent event) {
+                    // label.setHTML(board.symbols.get(index).get);
+
+                }
+            }, ClickEvent.getType());
+
+        }
+
+    }
+
 }

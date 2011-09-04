@@ -6,6 +6,7 @@
 war/WEB-INF/classes/
 war/WEB-INF/lib/
 war/WEB-INF/deploy/
-war/pgu-languages/
+war/pgu_languages/
+war/WEB-INF/appengine-generated/
 
 
