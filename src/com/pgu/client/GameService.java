@@ -9,6 +9,6 @@ import com.pgu.shared.Symbol;
 @RemoteServiceRelativePath("game")
 public interface GameService extends RemoteService {
 
-    List<Symbol> initGame();
+    List<Symbol> initGame(int nbOfSquares);
 
 }

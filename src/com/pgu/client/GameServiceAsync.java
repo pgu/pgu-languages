@@ -7,6 +7,6 @@ import com.pgu.shared.Symbol;
 
 public interface GameServiceAsync {
 
-    void initGame(AsyncCallback<List<Symbol>> asyncCallback);
+    void initGame(int nbOfSquares, AsyncCallback<List<Symbol>> asyncCallback);
 
 }
