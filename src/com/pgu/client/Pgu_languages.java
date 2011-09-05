@@ -13,11 +13,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.pgu.client.app.AsyncCallbackApp;
 import com.pgu.shared.Symbol;
@@ -32,8 +33,11 @@ public class Pgu_languages implements EntryPoint {
 
     private static final int N = 4;
 
+    final PopupPanel popupSuccess = new PopupPanel(true);
+
     @Override
     public void onModuleLoad() {
+        popupSuccess.add(new Label("Bravo, you win!"));
 
         final Button btnInitGame = new Button("initGame");
         RootPanel.get().add(btnInitGame);
@@ -301,15 +305,10 @@ public class Pgu_languages implements EntryPoint {
                     flowPanelCard.label.setHTML(S2.value);
 
                     if (S1.parent.equals(S2.parent)) {
-                        GWT.log("symbol is found!");
                         S1 = null;
                         S2 = null;
                         nbSymbolsToFind--;
-                        if (nbSymbolsToFind == 0) {
-                            Window.alert("Bravo, you win!");
-                        }
                     } else {
-                        GWT.log("symbol is not found!");
                         fpcS2 = flowPanelCard;
                         t.schedule(2000);
                     }
@@ -318,8 +317,11 @@ public class Pgu_languages implements EntryPoint {
                 t.cancel();
                 resetTour();
             }
-        } else {
 
+        }
+        if (nbSymbolsToFind == 0) {
+            popupSuccess.show();
+            popupSuccess.center();
         }
     }
 
