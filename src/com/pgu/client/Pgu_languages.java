@@ -289,38 +289,41 @@ public class Pgu_languages implements EntryPoint {
         final RowCol rowCol = new RowCol(flowPanelCard.index);
         final HalfPair halfPair = rowCol2HalfPair.get(rowCol);
 
-        if (S1 == null) {
-            setS1(flowPanelCard, halfPair);
-            return;
-        }
+        if ("".equals(flowPanelCard.label.getHTML())) {
+            if (S1 == null) {
+                setS1(flowPanelCard, halfPair);
+                return;
+            }
 
-        if (S2 == null) {
-            if (halfPair != S1) {
-                S2 = halfPair;
-                flowPanelCard.label.setHTML(S2.value);
+            if (S2 == null) {
+                if (halfPair != S1) {
+                    S2 = halfPair;
+                    flowPanelCard.label.setHTML(S2.value);
 
-                if (S1.parent.equals(S2.parent)) {
-                    GWT.log("symbol is found!");
-                    S1 = null;
-                    S2 = null;
-                    nbSymbolsToFind--;
-                    if (nbSymbolsToFind == 0) {
-                        Window.alert("Bravo, you win!");
+                    if (S1.parent.equals(S2.parent)) {
+                        GWT.log("symbol is found!");
+                        S1 = null;
+                        S2 = null;
+                        nbSymbolsToFind--;
+                        if (nbSymbolsToFind == 0) {
+                            Window.alert("Bravo, you win!");
+                        }
+                    } else {
+                        GWT.log("symbol is not found!");
+                        fpcS2 = flowPanelCard;
+                        t.schedule(2000);
                     }
-                } else {
-                    GWT.log("symbol is not found!");
-                    fpcS2 = flowPanelCard;
-                    t.schedule(2000);
                 }
+            } else {
+                t.cancel();
+                resetTour();
             }
         } else {
-            t.cancel();
-            resetTour();
+
         }
     }
 
     private void resetTour() {
-        GWT.log("reset tour");
         fpcS1.label.setHTML("");
         fpcS2.label.setHTML("");
         S1 = null;
@@ -328,7 +331,6 @@ public class Pgu_languages implements EntryPoint {
     }
 
     private void setS1(final FlowPanelCard flowPanelCard, final HalfPair halfPair) {
-        GWT.log("S1 est null");
         if ("".equals(flowPanelCard.label.getHTML())) {
             S1 = halfPair;
             flowPanelCard.label.setHTML(S1.value);
