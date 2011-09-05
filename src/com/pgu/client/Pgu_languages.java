@@ -37,7 +37,6 @@ public class Pgu_languages implements EntryPoint {
 
     @Override
     public void onModuleLoad() {
-        popupSuccess.add(new Label("Bravo, you win!"));
 
         final Button btnInitGame = new Button("initGame");
         RootPanel.get().add(btnInitGame);
@@ -149,6 +148,7 @@ public class Pgu_languages implements EntryPoint {
             }
         });
 
+        popupSuccess.add(new Label("Bravo, you win!"));
     }
 
     final Map<RowCol, HalfPair> rowCol2HalfPair = new HashMap<RowCol, HalfPair>();
