@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -14,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -109,6 +109,7 @@ public class Pgu_languages implements EntryPoint {
 
                     @Override
                     public void onSuccess(final List<Symbol> symbols) {
+                        nbSymbolsToFind = symbols.size();
                         rowCol2HalfPair.clear();
 
                         final LinkedList<Integer> indices = new LinkedList<Integer>();
@@ -132,9 +133,12 @@ public class Pgu_languages implements EntryPoint {
 
                         }
 
-                        for (final Entry<RowCol, HalfPair> entry : rowCol2HalfPair.entrySet()) {
-                            ftDebug.setWidget(entry.getKey().col, entry.getKey().row, new HTML(entry.getValue().value));
+                        int row = 0;
+                        for (final Symbol symbol : symbols) {
+                            ftDebug.setWidget(row, 0, new HTML(symbol.getAlpha()));
+                            ftDebug.setWidget(row++, 1, new HTML(symbol.getUnicode()));
                         }
+
                     }
 
                 });
@@ -266,72 +270,70 @@ public class Pgu_languages implements EntryPoint {
     }
 
     HalfPair S1;
-    Timer t;
-    FlowPanelCard fpcPrevious;
+    HalfPair S2;
+
+    FlowPanelCard fpcS1;
+    FlowPanelCard fpcS2;
+
+    Timer t = new Timer() {
+
+        @Override
+        public void run() {
+            resetTour();
+        }
+    };
+
+    int nbSymbolsToFind = 0;
 
     protected void isCellClicked(final FlowPanelCard flowPanelCard) {
         final RowCol rowCol = new RowCol(flowPanelCard.index);
         final HalfPair halfPair = rowCol2HalfPair.get(rowCol);
 
         if (S1 == null) {
-            GWT.log("S1 est null");
-            flowPanelCard.label.setHTML(halfPair.value);
-            S1 = halfPair;
-            fpcPrevious = flowPanelCard;
+            setS1(flowPanelCard, halfPair);
             return;
         }
 
-        if (rowCol.equals(new RowCol(fpcPrevious.index))) {
-            GWT.log("same cell is clicked");
+        if (S2 == null) {
+            if (halfPair != S1) {
+                S2 = halfPair;
+                flowPanelCard.label.setHTML(S2.value);
 
-            if ("".equals(fpcPrevious.label.getHTML())) {
-                GWT.log(".. show value");
-
-                fpcPrevious.label.setHTML(halfPair.value);
-                if (t != null) {
-                    t.cancel();
-                }
-                t = new Timer() {
-
-                    @Override
-                    public void run() {
-                        fpcPrevious.label.setHTML("");
+                if (S1.parent.equals(S2.parent)) {
+                    GWT.log("symbol is found!");
+                    S1 = null;
+                    S2 = null;
+                    nbSymbolsToFind--;
+                    if (nbSymbolsToFind == 0) {
+                        Window.alert("Bravo, you win!");
                     }
-                };
-                t.schedule(3000);
-                return;
-            } else {
-                GWT.log(".. hide value");
-
-                fpcPrevious.label.setHTML("");
-                return;
+                } else {
+                    GWT.log("symbol is not found!");
+                    fpcS2 = flowPanelCard;
+                    t.schedule(2000);
+                }
             }
-        }
-
-        if (S1.equals(halfPair)) {
-            GWT.log("symbol is found!");
-            flowPanelCard.label.setHTML(halfPair.value);
-            S1 = null;
-            fpcPrevious = null;
-            return;
-        }
-
-        GWT.log("symbol is not found!");
-        flowPanelCard.label.setHTML(halfPair.value);
-        fpcPrevious.label.setHTML("");
-        if (null != t) {
+        } else {
             t.cancel();
+            resetTour();
         }
-        t = new Timer() {
+    }
 
-            @Override
-            public void run() {
-                flowPanelCard.label.setHTML("");
-            }
-        };
-        t.schedule(3000);
-        fpcPrevious = flowPanelCard;
+    private void resetTour() {
+        GWT.log("reset tour");
+        fpcS1.label.setHTML("");
+        fpcS2.label.setHTML("");
+        S1 = null;
+        S2 = null;
+    }
 
+    private void setS1(final FlowPanelCard flowPanelCard, final HalfPair halfPair) {
+        GWT.log("S1 est null");
+        if ("".equals(flowPanelCard.label.getHTML())) {
+            S1 = halfPair;
+            flowPanelCard.label.setHTML(S1.value);
+            fpcS1 = flowPanelCard;
+        }
     }
 
 }
