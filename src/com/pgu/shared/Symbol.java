@@ -7,12 +7,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class Symbol implements IsSerializable {
 
     public enum Group {
-        HIRAGANA
+        HIRAGANA, KATAKANA, RUSSIAN
     }
 
     @Id
     private Long id;
-    private Group family;
+    private Group group;
     private String alpha;
     private String unicode;
 
@@ -20,8 +20,8 @@ public class Symbol implements IsSerializable {
         super();
     }
 
-    public Symbol(final Group family, final String alpha, final String unicode) {
-        this.family = family;
+    public Symbol(final Group group, final String alpha, final String unicode) {
+        this.group = group;
         this.alpha = alpha;
         this.unicode = unicode;
     }
@@ -58,7 +58,7 @@ public class Symbol implements IsSerializable {
 
     @Override
     public String toString() {
-        return "Symbol [id=" + id + ", family=" + family + ", alpha=" + alpha + ", unicode=" + unicode + "]";
+        return "Symbol [id=" + id + ", group=" + group + ", alpha=" + alpha + ", unicode=" + unicode + "]";
     }
 
     public Long getId() {
@@ -69,12 +69,12 @@ public class Symbol implements IsSerializable {
         this.id = id;
     }
 
-    public Group getFamily() {
-        return family;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setFamily(final Group family) {
-        this.family = family;
+    public void setGroup(final Group group) {
+        this.group = group;
     }
 
     public String getAlpha() {

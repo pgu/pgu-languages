@@ -14,14 +14,20 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.pgu.client.app.AsyncCallbackApp;
+import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
+import com.pgu.shared.Symbol.Group;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -31,50 +37,243 @@ public class Pgu_languages implements EntryPoint {
     InitServiceAsync initService = GWT.create(InitService.class);
     GameServiceAsync gameService = GWT.create(GameService.class);
 
-    private static final int N = 4;
+    private int N = 4;
 
     final PopupPanel popupSuccess = new PopupPanel(true);
+    final ListBox group = new ListBox();
+    final ListBox gameSize = new ListBox();
+    final ListBox vowels = new ListBox(true);
+    final ListBox consonants = new ListBox(true);
+    final Button btnInitGame = new Button("initGame");
+    final FlexTable ft = new FlexTable();
+    final Button btnDeleteData = new Button("deleteData");
+    final Button btnInitData = new Button("initData");
+    final FlexTable ftDebug = new FlexTable();
 
     @Override
     public void onModuleLoad() {
 
-        final Button btnInitGame = new Button("initGame");
-        RootPanel.get().add(btnInitGame);
-        final HTML sep = new HTML("");
-        sep.setHeight("5px");
-        RootPanel.get().add(sep);
+        final VerticalPanel vp = new VerticalPanel();
+        vp.add(btnInitGame);
+        vp.add(group);
+        vp.add(gameSize);
 
-        final FlexTable ft = new FlexTable();
-        RootPanel.get().add(ft);
-        final HTML sep2 = new HTML("");
-        sep2.setHeight("5px");
-        RootPanel.get().add(sep2);
+        final HorizontalPanel hpFilters = new HorizontalPanel();
+        hpFilters.add(vowels);
+        hpFilters.add(consonants);
+        vp.add(hpFilters);
 
-        final Button btnDeleteData = new Button("deleteData");
-        RootPanel.get().add(btnDeleteData);
-        final Button btnInitData = new Button("initData");
-        RootPanel.get().add(btnInitData);
-        final HTML sep3 = new HTML("");
-        sep3.setHeight("5px");
-        RootPanel.get().add(sep3);
-        final FlexTable ftDebug = new FlexTable();
-        RootPanel.get().add(ftDebug);
+        final DisclosurePanel dp = new DisclosurePanel("Admin");
+        final FlowPanel fp = new FlowPanel();
+        fp.add(btnDeleteData);
+        fp.add(btnInitData);
+        dp.add(fp);
 
-        int index = 0;
-        for (int row = 0; row < N; row++) {
-            for (int col = 0; col < N; col++) {
+        final HorizontalPanel hp = new HorizontalPanel();
+        hp.add(ft);
+        hp.add(vp);
+        hp.add(ftDebug);
+        hp.add(dp);
 
-                final FlowPanelCard cellFormat = new FlowPanelCard(index++, this);
-                final Style style = cellFormat.getElement().getStyle();
-                style.setBackgroundColor("limegreen");
-                style.setWidth(25, Unit.PX);
-                style.setHeight(25, Unit.PX);
+        hp.setSpacing(20);
 
-                ft.setWidget(row, col, cellFormat);
+        RootPanel.get().add(hp);
+        addSeparator();
+
+        formatBoard();
+
+        setActionInitData();
+        setActionDeleteData();
+        setActionInitGame();
+
+        setSelectionGroup();
+        setSelectionGameSize();
+        setSelectionVowel();
+        setSelectionConsonant();
+
+        popupSuccess.add(new Label("Bravo, you win!"));
+        initGame();
+    }
+
+    private void addSeparator() {
+        final HTML sp = new HTML("");
+        sp.setHeight("5px");
+        RootPanel.get().add(sp);
+    }
+
+    private void setSelectionConsonant() {
+        consonants.addItem("");
+        consonants.addItem("-");
+        consonants.addItem("K");
+        consonants.addItem("S");
+        consonants.addItem("T");
+        consonants.addItem("N");
+        consonants.addItem("H");
+        consonants.addItem("M");
+        consonants.addItem("Y");
+        consonants.addItem("R");
+        consonants.addItem("W");
+        consonants.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                for (int i = 0; i < vowels.getItemCount(); i++) {
+                    vowels.setItemSelected(i, false);
+                }
+            }
+        });
+    }
+
+    private void setSelectionVowel() {
+        vowels.addItem("");
+        vowels.addItem("A");
+        vowels.addItem("E");
+        vowels.addItem("I");
+        vowels.addItem("O");
+        vowels.addItem("U");
+        vowels.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                for (int i = 0; i < consonants.getItemCount(); i++) {
+                    consonants.setItemSelected(i, false);
+                }
+            }
+        });
+    }
+
+    private void setSelectionGroup() {
+        for (final Group gr : Symbol.Group.values()) {
+            group.addItem(gr.toString());
+        }
+    }
+
+    private void setSelectionGameSize() {
+        gameSize.addItem("2");
+        gameSize.addItem("4");
+        gameSize.addItem("6");
+        gameSize.setSelectedIndex(1);
+    }
+
+    private void setActionInitGame() {
+        btnInitGame.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                initGame();
+            }
+
+        });
+    }
+
+    private void initGame() {
+        final GameConfig gc = new GameConfig();
+        setConfigGroup(gc);
+        setConfigSize(gc);
+        setConfigVowels(gc);
+        setConfigConsonants(gc);
+
+        gameService.initGame(gc, new AsyncCallbackApp<List<Symbol>>() {
+
+            @Override
+            public void onSuccess(final List<Symbol> symbols) {
+                formatBoard();
+                nbSymbolsToFind = symbols.size();
+                rowCol2HalfPair.clear();
+
+                final LinkedList<Integer> indices = new LinkedList<Integer>();
+                for (int index = 0; index < N * N; index++) {
+                    indices.addLast(index);
+                }
+
+                final LinkedList<Symbol> bufferSymbols = new LinkedList<Symbol>();
+                bufferSymbols.addAll(symbols);
+
+                while (!bufferSymbols.isEmpty()) {
+                    final Symbol symbol = bufferSymbols.poll();
+
+                    // set alpha
+                    Integer index = indices.remove(Random.nextInt(indices.size()));
+                    rowCol2HalfPair.put(new RowCol(index), new HalfPair(symbol.getAlpha(), symbol));
+
+                    // set unicode
+                    index = indices.remove(Random.nextInt(indices.size()));
+                    rowCol2HalfPair.put(new RowCol(index), new HalfPair(symbol.getUnicode(), symbol));
+
+                }
+
+                formatFtDebug(symbols);
 
             }
-        }
 
+        });
+    }
+
+    private void formatFtDebug(final List<Symbol> symbols) {
+        ftDebug.clear();
+        int row = 0;
+        for (final Symbol symbol : symbols) {
+            ftDebug.setWidget(row, 0, new HTML(symbol.getAlpha()));
+            ftDebug.setWidget(row++, 1, new HTML(symbol.getUnicode()));
+        }
+    }
+
+    private void setConfigConsonants(final GameConfig gc) {
+        for (int i = 1; i < consonants.getItemCount(); i++) {
+            if (consonants.isItemSelected(i)) {
+                gc.consonants.add(consonants.getValue(i));
+            }
+        }
+    }
+
+    private void setConfigVowels(final GameConfig gc) {
+        for (int i = 1; i < vowels.getItemCount(); i++) {
+            if (vowels.isItemSelected(i)) {
+                gc.vowels.add(vowels.getValue(i));
+            }
+        }
+    }
+
+    private void setConfigSize(final GameConfig gc) {
+        final int selectedIndex = gameSize.getSelectedIndex();
+        if (isNothingSelected(selectedIndex)) {
+            N = 4;
+        } else {
+            N = Integer.parseInt(gameSize.getItemText(selectedIndex));
+        }
+        gc.size = N * N;
+    }
+
+    private void setConfigGroup(final GameConfig gc) {
+        final int selectedIndex = group.getSelectedIndex();
+        if (isNothingSelected(selectedIndex)) {
+            gc.group = Group.HIRAGANA;
+        } else {
+            gc.group = Group.valueOf(group.getItemText(selectedIndex));
+        }
+    }
+
+    private boolean isNothingSelected(final int selectedIndex) {
+        return selectedIndex == -1;
+    }
+
+    private void setActionDeleteData() {
+        btnDeleteData.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                initService.deleteData(new AsyncCallbackApp<Void>() {
+
+                    @Override
+                    public void onSuccess(final Void result) {
+                        GWT.log("clean data is done");
+                    }
+                });
+            }
+        });
+    }
+
+    private void setActionInitData() {
         btnInitData.addClickHandler(new ClickHandler() {
 
             @Override
@@ -89,66 +288,24 @@ public class Pgu_languages implements EntryPoint {
                 });
             }
         });
+    }
 
-        btnDeleteData.addClickHandler(new ClickHandler() {
+    private void formatBoard() {
+        ft.clear();
+        int index = 0;
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
 
-            @Override
-            public void onClick(final ClickEvent event) {
-                initService.deleteData(new AsyncCallbackApp<Void>() {
+                final FlowPanelCard cellFormat = new FlowPanelCard(index++, this);
+                final Style style = cellFormat.getElement().getStyle();
+                style.setBackgroundColor("limegreen");
+                style.setWidth(25, Unit.PX);
+                style.setHeight(25, Unit.PX);
 
-                    @Override
-                    public void onSuccess(final Void result) {
-                        GWT.log("clean data is done");
-                    }
-                });
+                ft.setWidget(row, col, cellFormat);
+
             }
-        });
-
-        btnInitGame.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                gameService.initGame(N * N, new AsyncCallbackApp<List<Symbol>>() {
-
-                    @Override
-                    public void onSuccess(final List<Symbol> symbols) {
-                        nbSymbolsToFind = symbols.size();
-                        rowCol2HalfPair.clear();
-
-                        final LinkedList<Integer> indices = new LinkedList<Integer>();
-                        for (int index = 0; index < N * N; index++) {
-                            indices.addLast(index);
-                        }
-
-                        final LinkedList<Symbol> bufferSymbols = new LinkedList<Symbol>();
-                        bufferSymbols.addAll(symbols);
-
-                        while (!bufferSymbols.isEmpty()) {
-                            final Symbol symbol = bufferSymbols.poll();
-
-                            // set alpha
-                            Integer index = indices.remove(Random.nextInt(indices.size()));
-                            rowCol2HalfPair.put(new RowCol(index), new HalfPair(symbol.getAlpha(), symbol));
-
-                            // set unicode
-                            index = indices.remove(Random.nextInt(indices.size()));
-                            rowCol2HalfPair.put(new RowCol(index), new HalfPair(symbol.getUnicode(), symbol));
-
-                        }
-
-                        int row = 0;
-                        for (final Symbol symbol : symbols) {
-                            ftDebug.setWidget(row, 0, new HTML(symbol.getAlpha()));
-                            ftDebug.setWidget(row++, 1, new HTML(symbol.getUnicode()));
-                        }
-
-                    }
-
-                });
-            }
-        });
-
-        popupSuccess.add(new Label("Bravo, you win!"));
+        }
     }
 
     final Map<RowCol, HalfPair> rowCol2HalfPair = new HashMap<RowCol, HalfPair>();
@@ -207,7 +364,7 @@ public class Pgu_languages implements EntryPoint {
 
     }
 
-    public static class RowCol {
+    public class RowCol {
         private final int row;
         private final int col;
 
