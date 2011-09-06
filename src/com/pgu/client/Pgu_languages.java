@@ -9,6 +9,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
@@ -88,8 +90,8 @@ public class Pgu_languages implements EntryPoint {
 
         setSelectionGroup();
         setSelectionGameSize();
-        setSelectionVowel();
-        setSelectionConsonant();
+        setSelectionVowels();
+        setSelectionConsonants();
 
         popupSuccess.add(new Label("Bravo, you win!"));
         initGame();
@@ -101,7 +103,7 @@ public class Pgu_languages implements EntryPoint {
         RootPanel.get().add(sp);
     }
 
-    private void setSelectionConsonant() {
+    private void setSelectionConsonants() {
         consonants.addItem("");
         consonants.addItem("-");
         consonants.addItem("K");
@@ -122,9 +124,10 @@ public class Pgu_languages implements EntryPoint {
                 }
             }
         });
+        consonants.setHeight("100px");
     }
 
-    private void setSelectionVowel() {
+    private void setSelectionVowels() {
         vowels.addItem("");
         vowels.addItem("A");
         vowels.addItem("E");
@@ -140,12 +143,27 @@ public class Pgu_languages implements EntryPoint {
                 }
             }
         });
+        vowels.setHeight("100px");
     }
 
     private void setSelectionGroup() {
         for (final Group gr : Symbol.Group.values()) {
             group.addItem(gr.toString());
         }
+        group.addChangeHandler(new ChangeHandler() {
+
+            @Override
+            public void onChange(final ChangeEvent event) {
+                final Group gr = Group.valueOf(group.getItemText(group.getSelectedIndex()));
+                final boolean isJapanese = isJapanese(gr);
+                vowels.setVisible(isJapanese);
+                consonants.setVisible(isJapanese);
+            }
+
+            private boolean isJapanese(final Group gr) {
+                return gr == Group.HIRAGANA || gr == Group.KATAKANA;
+            }
+        });
     }
 
     private void setSelectionGameSize() {
