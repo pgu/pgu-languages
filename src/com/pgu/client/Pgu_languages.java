@@ -31,9 +31,6 @@ import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
 
-/**
- * Entry point classes define <code>onModuleLoad()</code>.
- */
 public class Pgu_languages implements EntryPoint {
 
     InitServiceAsync initService = GWT.create(InitService.class);
@@ -47,10 +44,12 @@ public class Pgu_languages implements EntryPoint {
     final ListBox vowels = new ListBox(true);
     final ListBox consonants = new ListBox(true);
     final Button btnInitGame = new Button("initGame");
+    final Button btnResetGame = new Button("resetGame");
     final FlexTable ft = new FlexTable();
     final Button btnDeleteData = new Button("deleteData");
     final Button btnInitData = new Button("initData");
     final FlexTable ftDebug = new FlexTable();
+    Label timeSpent = new Label("00:00");
 
     @Override
     public void onModuleLoad() {
@@ -64,6 +63,7 @@ public class Pgu_languages implements EntryPoint {
         hpFilters.add(vowels);
         hpFilters.add(consonants);
         vp.add(hpFilters);
+        vp.add(btnResetGame);
 
         final DisclosurePanel dp = new DisclosurePanel("Admin");
         final FlowPanel fp = new FlowPanel();
@@ -71,8 +71,12 @@ public class Pgu_languages implements EntryPoint {
         fp.add(btnInitData);
         dp.add(fp);
 
+        final FlowPanel fp2 = new FlowPanel();
+        fp2.add(ft);
+        fp2.add(timeSpent);
+
         final HorizontalPanel hp = new HorizontalPanel();
-        hp.add(ft);
+        hp.add(fp2);
         hp.add(vp);
         hp.add(ftDebug);
         hp.add(dp);
@@ -87,6 +91,7 @@ public class Pgu_languages implements EntryPoint {
         setActionInitData();
         setActionDeleteData();
         setActionInitGame();
+        setActionResetGame();
 
         setSelectionGroup();
         setSelectionGameSize();
@@ -94,7 +99,35 @@ public class Pgu_languages implements EntryPoint {
         setSelectionConsonants();
 
         popupSuccess.add(new Label("Bravo, you win!"));
-        initGame();
+
+        final Style styleTS = timeSpent.getElement().getStyle();
+        styleTS.setProperty("marginLeft", "auto");
+        styleTS.setProperty("marginRight", "auto");
+        styleTS.setWidth(30, Unit.PX);
+    }
+
+    private void setActionResetGame() {
+        btnResetGame.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                resetGameFlags();
+                resetUI();
+            }
+
+        });
+    }
+
+    private void resetUI() {
+        timeSpent.setText("00:00");
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                final FlowPanelCard fpc = (FlowPanelCard) ft.getWidget(row, col);
+                fpc.label.setHTML("");
+                final Style style = fpc.getElement().getStyle();
+                style.setBackgroundColor("limegreen");
+            }
+        }
     }
 
     private void addSeparator() {
@@ -184,7 +217,27 @@ public class Pgu_languages implements EntryPoint {
         });
     }
 
+    int seconds = 0;
+    Timer timerSeconds = new Timer() {
+
+        @Override
+        public void run() {
+            seconds++;
+            final int minutes = seconds / 60;
+            final int sec = seconds % 60;
+            timeSpent.setText(fmt(minutes) + ":" + fmt(sec));
+        }
+
+        private String fmt(final int n) {
+            return (n < 10 ? "0" : "") + n;
+        }
+    };
+
+    boolean isGameOn = false;
+
     private void initGame() {
+        resetGameFlags();
+
         final GameConfig gc = new GameConfig();
         setConfigGroup(gc);
         setConfigSize(gc);
@@ -195,6 +248,7 @@ public class Pgu_languages implements EntryPoint {
 
             @Override
             public void onSuccess(final List<Symbol> symbols) {
+
                 formatBoard();
                 nbSymbolsToFind = symbols.size();
                 rowCol2HalfPair.clear();
@@ -220,8 +274,9 @@ public class Pgu_languages implements EntryPoint {
 
                 }
 
+                isGameOn = true;
+                timerSeconds.scheduleRepeating(1000);
                 formatFtDebug(symbols);
-
             }
 
         });
@@ -465,39 +520,55 @@ public class Pgu_languages implements EntryPoint {
     int nbSymbolsToFind = 0;
 
     protected void isCellClicked(final FlowPanelCard flowPanelCard) {
-        final RowCol rowCol = new RowCol(flowPanelCard.index);
-        final HalfPair halfPair = rowCol2HalfPair.get(rowCol);
+        if (isGameOn) {
 
-        if ("".equals(flowPanelCard.label.getHTML())) {
-            if (S1 == null) {
-                setS1(flowPanelCard, halfPair);
+            final RowCol rowCol = new RowCol(flowPanelCard.index);
+            final HalfPair halfPair = rowCol2HalfPair.get(rowCol);
+
+            if (halfPair == null) {
+                flowPanelCard.label.setHTML("");
+                flowPanelCard.getElement().getStyle().setBackgroundColor("blue");
                 return;
             }
 
-            if (S2 == null) {
-                if (halfPair != S1) {
-                    S2 = halfPair;
-                    flowPanelCard.label.setHTML(S2.value);
-
-                    if (S1.parent.equals(S2.parent)) {
-                        S1 = null;
-                        S2 = null;
-                        nbSymbolsToFind--;
-                    } else {
-                        fpcS2 = flowPanelCard;
-                        t.schedule(2000);
-                    }
+            if ("".equals(flowPanelCard.label.getHTML())) {
+                if (S1 == null) {
+                    setS1(flowPanelCard, halfPair);
+                    return;
                 }
-            } else {
-                t.cancel();
-                resetTour();
-            }
 
+                if (S2 == null) {
+                    if (halfPair != S1) {
+                        S2 = halfPair;
+                        flowPanelCard.label.setHTML(S2.value);
+
+                        if (S1.parent.equals(S2.parent)) {
+                            S1 = null;
+                            S2 = null;
+                            nbSymbolsToFind--;
+                        } else {
+                            fpcS2 = flowPanelCard;
+                            t.schedule(2000);
+                        }
+                    }
+                } else {
+                    t.cancel();
+                    resetTour();
+                }
+
+            }
+            if (nbSymbolsToFind == 0) {
+                resetGameFlags();
+                popupSuccess.show();
+                popupSuccess.center();
+            }
         }
-        if (nbSymbolsToFind == 0) {
-            popupSuccess.show();
-            popupSuccess.center();
-        }
+    }
+
+    private void resetGameFlags() {
+        isGameOn = false;
+        seconds = 0;
+        timerSeconds.cancel();
     }
 
     private void resetTour() {
