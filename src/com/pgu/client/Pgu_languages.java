@@ -17,7 +17,6 @@ import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -60,18 +59,20 @@ public class Pgu_languages implements EntryPoint {
     final Button btnInitGame = new Button("initGame");
     final Button btnResetGame = new Button("resetGame");
     final FlexTable ft = new FlexTable();
-    final Button btnDeleteData = new Button("deleteData");
-    final Button btnInitData = new Button("initData");
-    final Button btnLogout = new Button("logout");
+    // final Button btnDeleteData = new Button("deleteData");
+    // final Button btnInitData = new Button("initData");
     final FlexTable ftDebug = new FlexTable();
     Label timeSpent = new Label("00:00");
-    InlineLabel playerName = new InlineLabel();
-    Label playerProvider = new Label();
-    Label playerScore = new Label();
+    Label playerScore;
 
     final HorizontalPanel hp = new HorizontalPanel();
-    final DisclosurePanel adminPanel = new DisclosurePanel("Admin");
-    final FlowPanel playerPanel = new FlowPanel();
+    // final DisclosurePanel adminPanel = new DisclosurePanel("Admin");
+    FlowPanel playerPanel;
+    FlowPanel loginPanel;
+
+    final Button btnFacebook = new Button("Facebook");
+    final Button btnGoogle = new Button("Google");
+    final Button btnTwitter = new Button("Twitter");
 
     @Override
     public void onModuleLoad() {
@@ -95,15 +96,6 @@ public class Pgu_languages implements EntryPoint {
         hp.add(vp);
         hp.add(ftDebug);
 
-        loginPanel.add(btnFacebook);
-        loginPanel.add(btnGoogle);
-        loginPanel.add(btnTwitter);
-        hp.add(loginPanel);
-
-        setActionLoginFacebook();
-        setActionLoginGoogle();
-        setActionLoginTwitter();
-
         hp.setSpacing(20);
 
         RootPanel.get().add(hp);
@@ -111,23 +103,9 @@ public class Pgu_languages implements EntryPoint {
 
         formatBoard();
 
-        playerPanel.add(new InlineLabel("Account: "));
-        playerPanel.add(playerName);
-        playerPanel.add(playerProvider);
-        playerPanel.add(new InlineLabel("Score: "));
-        playerPanel.add(playerScore);
-        playerPanel.add(btnLogout);
-        hp.add(playerPanel);
-
-        final FlowPanel fpAdmin = new FlowPanel();
-        fpAdmin.add(btnDeleteData);
-        fpAdmin.add(btnInitData);
-        adminPanel.add(fpAdmin);
-        hp.add(adminPanel);
-
-        setActionInitData();
-        setActionDeleteData();
-        setActionLogout();
+        // addAdminMenu();
+        // setActionInitData();
+        // setActionDeleteData();
 
         getLoggedInUser();
 
@@ -148,6 +126,51 @@ public class Pgu_languages implements EntryPoint {
 
     }
 
+    private void addPlayerPanel() {
+        playerPanel = new FlowPanel();
+        playerPanel.add(new InlineLabel("Account: "));
+
+        final InlineLabel playerName = new InlineLabel();
+        playerPanel.add(playerName);
+
+        final Label playerProvider = new Label();
+        playerPanel.add(playerProvider);
+
+        playerPanel.add(new InlineLabel("Score: "));
+
+        playerScore = new Label();
+        playerPanel.add(playerScore);
+
+        final Button btnLogout = new Button("logout");
+        playerPanel.add(btnLogout);
+
+        hp.add(playerPanel);
+        setActionLogout(btnLogout);
+
+        playerName.setText(user.getName());
+        playerProvider.setText(user.getProviderAuth().toString());
+    }
+
+    private void addLoginPanel() {
+        loginPanel = new FlowPanel();
+        loginPanel.add(btnFacebook);
+        loginPanel.add(btnGoogle);
+        loginPanel.add(btnTwitter);
+        hp.add(loginPanel);
+
+        setActionLoginFacebook();
+        setActionLoginGoogle();
+        setActionLoginTwitter();
+    }
+
+    private void addAdminMenu() {
+        // final FlowPanel fpAdmin = new FlowPanel();
+        // fpAdmin.add(btnDeleteData);
+        // fpAdmin.add(btnInitData);
+        // adminPanel.add(fpAdmin);
+        // hp.add(adminPanel);
+    }
+
     private UserAccount user;
 
     private void getLoggedInUser() {
@@ -158,31 +181,19 @@ public class Pgu_languages implements EntryPoint {
                 if (null == loggedInUser) {
                     showLoginView();
                 } else {
-                    setCurrentUser(loggedInUser);
-                    goAfterLogin();
+                    goAfterLogin(loggedInUser);
                 }
-            }
-
-            private void setCurrentUser(final UserAccount loggedInUser) {
-                user = loggedInUser;
             }
 
         });
     }
 
-    final Button btnFacebook = new Button("Facebook");
-    final Button btnGoogle = new Button("Google");
-    final Button btnTwitter = new Button("Twitter");
-
-    final FlowPanel loginPanel = new FlowPanel();
-
     private void showLoginView() {
-        loginPanel.setVisible(true);
-        adminPanel.setVisible(false);
-        playerPanel.setVisible(false);
-        playerName.setText("");
-        playerScore.setText("");
-        playerProvider.setText("");
+        addLoginPanel();
+        // adminPanel.setVisible(false);
+        if (null != playerPanel) {
+            playerPanel.removeFromParent();
+        }
     }
 
     private void setActionLoginFacebook() {
@@ -215,13 +226,15 @@ public class Pgu_languages implements EntryPoint {
         });
     }
 
-    private void goAfterLogin() {
-        loginPanel.setVisible(false);
-        playerPanel.setVisible(true);
-        playerName.setText(user.getName());
-        playerProvider.setText(user.getProviderAuth().toString());
+    private void goAfterLogin(final UserAccount loggedInUser) {
+        user = loggedInUser;
 
-        adminPanel.setVisible(false); // TODO PGU
+        if (null != loginPanel) {
+            loginPanel.removeFromParent();
+        }
+        addPlayerPanel();
+
+        // adminPanel.setVisible(false);
 
         playerService.getScore(user, new AsyncCallbackApp<Integer>() {
 
@@ -232,7 +245,7 @@ public class Pgu_languages implements EntryPoint {
         });
     }
 
-    private void setActionLogout() {
+    private void setActionLogout(final Button btnLogout) {
         btnLogout.addClickHandler(new ClickHandler() {
 
             @Override
@@ -478,36 +491,36 @@ public class Pgu_languages implements EntryPoint {
     }
 
     private void setActionDeleteData() {
-        btnDeleteData.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                initService.deleteData(new AsyncCallbackApp<Void>() {
-
-                    @Override
-                    public void onSuccess(final Void result) {
-                        GWT.log("clean data is done");
-                    }
-                });
-            }
-        });
+        // btnDeleteData.addClickHandler(new ClickHandler() {
+        //
+        // @Override
+        // public void onClick(final ClickEvent event) {
+        // initService.deleteData(new AsyncCallbackApp<Void>() {
+        //
+        // @Override
+        // public void onSuccess(final Void result) {
+        // GWT.log("clean data is done");
+        // }
+        // });
+        // }
+        // });
     }
 
     private void setActionInitData() {
-        btnInitData.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                btnInitData.setEnabled(false);
-                initService.initData(new AsyncCallbackApp<Void>() {
-
-                    @Override
-                    public void onSuccess(final Void result) {
-                        GWT.log("init is done");
-                    }
-                });
-            }
-        });
+        // btnInitData.addClickHandler(new ClickHandler() {
+        //
+        // @Override
+        // public void onClick(final ClickEvent event) {
+        // btnInitData.setEnabled(false);
+        // initService.initData(new AsyncCallbackApp<Void>() {
+        //
+        // @Override
+        // public void onSuccess(final Void result) {
+        // GWT.log("init is done");
+        // }
+        // });
+        // }
+        // });
     }
 
     private void formatBoard() {
