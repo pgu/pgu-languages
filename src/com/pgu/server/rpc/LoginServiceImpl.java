@@ -46,9 +46,4 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
         getThreadLocalRequest().getSession().invalidate();
     }
 
-    @Override
-    public boolean isAdmin(final UserAccount user) {
-        return System.getProperty("ADMIN_DATA").equals(user.getName());
-    }
-
 }

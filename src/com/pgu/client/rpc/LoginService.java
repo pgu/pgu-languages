@@ -11,6 +11,4 @@ public interface LoginService extends RemoteService {
 
     void logout();
 
-    boolean isAdmin(UserAccount user);
-
 }

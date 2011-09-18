@@ -3,26 +3,50 @@ package com.pgu.server.rpc;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Objectify;
 import com.pgu.client.rpc.InitService;
 import com.pgu.server.dao.ObjectifyDao;
+import com.pgu.server.utils.ConfigApp;
+import com.pgu.server.utils.ServletHelper.Attributes;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
+import com.pgu.shared.UserAccount;
 
 public class InitServiceImpl extends RemoteServiceServlet implements InitService {
 
     private static final long serialVersionUID = -7873557792672762717L;
 
-    @Override
-    public void initData() {
-        final List<Symbol> symbols = new ArrayList<Symbol>();
-        addHiragana(symbols);
-        addKatakana(symbols);
-        addRussian(symbols);
+    private boolean isAdmin() {
+        final HttpSession session = getThreadLocalRequest().getSession();
+        if (session == null) {
+            return false; // user not logged in
+        }
+
+        final Long userId = (Long) session.getAttribute(Attributes.USER_ID.toString());
+        if (userId == null) {
+            return false; // user not logged in
+        }
 
         final Objectify ofy = ObjectifyDao.ofy();
-        ofy.put(symbols);
+        final UserAccount user = ofy.get(UserAccount.class, userId);
+
+        return ConfigApp.ADMIN_DATA.getValue().equals(user.getName());
+    }
+
+    @Override
+    public void initData() {
+        if (isAdmin()) {
+            final List<Symbol> symbols = new ArrayList<Symbol>();
+            addHiragana(symbols);
+            addKatakana(symbols);
+            addRussian(symbols);
+
+            final Objectify ofy = ObjectifyDao.ofy();
+            ofy.put(symbols);
+        }
     }
 
     private void addRussian(final List<Symbol> symbols) {
@@ -220,8 +244,10 @@ public class InitServiceImpl extends RemoteServiceServlet implements InitService
 
     @Override
     public void deleteData() {
-        final Objectify ofy = ObjectifyDao.ofy();
-        ofy.delete(ofy.query(Symbol.class).list());
+        if (isAdmin()) {
+            final Objectify ofy = ObjectifyDao.ofy();
+            ofy.delete(ofy.query(Symbol.class).list());
+        }
     }
 
 }

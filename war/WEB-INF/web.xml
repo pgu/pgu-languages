@@ -94,6 +94,10 @@
     <filter-name>loginfilter</filter-name>
     <url-pattern>/pgu_languages/player</url-pattern>
   </filter-mapping>
+  <filter-mapping>
+    <filter-name>loginfilter</filter-name>
+    <url-pattern>/pgu_languages/init</url-pattern>
+  </filter-mapping>
 
   <!-- Default page to serve -->
   <welcome-file-list>

@@ -221,14 +221,7 @@ public class Pgu_languages implements EntryPoint {
         playerName.setText(user.getName());
         playerProvider.setText(user.getProviderAuth().toString());
 
-        loginService.isAdmin(user, new AsyncCallbackApp<Boolean>() {
-
-            @Override
-            public void onSuccess(final Boolean isAdmin) {
-                adminPanel.setVisible(isAdmin);
-            }
-
-        });
+        adminPanel.setVisible(false); // TODO PGU
 
         playerService.getScore(user, new AsyncCallbackApp<Integer>() {
 

@@ -9,6 +9,4 @@ public interface LoginServiceAsync {
 
     void logout(AsyncCallback<Void> asyncCallbackApp);
 
-    void isAdmin(UserAccount user, AsyncCallback<Boolean> asyncCallbackApp);
-
 }
