@@ -1,49 +1,42 @@
 <!doctype html>
-<!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
 
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-    <!--                                                               -->
-    <!-- Consider inlining CSS to reduce the number of requested files -->
-    <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="Pgu_languages.css">
+<link rel="stylesheet" href="css/smartphone.css"
+    media="only screen and (min-device-width : 320px) and (max-device-width : 480px)">
 
-    <!--                                           -->
-    <!-- Any title is fine                         -->
-    <!--                                           -->
-    <title>Web Application Starter Project</title>
-    
-    <!--                                           -->
-    <!-- This script loads your compiled module.   -->
-    <!-- If you add any GWT meta tags, they must   -->
-    <!-- be added before this line.                -->
-    <!--                                           -->
-    <script type="text/javascript" language="javascript" src="pgu_languages/pgu_languages.nocache.js"></script>
-  </head>
+<link rel="stylesheet" href="css/smartphone-landscape.css" media="only screen and (min-width : 321px)">
 
-  <!--                                           -->
-  <!-- The body can have arbitrary html, or      -->
-  <!-- you can leave the body empty if you want  -->
-  <!-- to create a completely dynamic UI.        -->
-  <!--                                           -->
-  <body>
+<link rel="stylesheet" href="css/smartphone-portrait.css" media="only screen and (max-width : 320px)">
 
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
-    
-    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+<link rel="stylesheet" href="css/ipad.css"
+    media="only screen and (min-device-width : 768px) and (max-device-width : 1024px)">
+
+<link rel="stylesheet" href="css/ipad-landscape.css"
+    media="only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape)">
+
+<link rel="stylesheet" href="css/ipad-portrait.css"
+    media="only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait)">
+
+<link rel="stylesheet" href="css/widescreen.css" media="only screen and (min-width : 1824px)">
+
+<link rel="stylesheet" href="css/iphone4.css" media="only screen and (-webkit-min-device-pixel-ratio : 1.5), only screen and (min-device-pixel-ratio : 1.5)">
+
+<title>Memo games</title>
+
+<script type="text/javascript" language="javascript" src="pgu_languages/pgu_languages.nocache.js"></script>
+</head>
+
+<body>
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
+        style="position: absolute; width: 0; height: 0; border: 0"></iframe>
     <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
+        <div
+            style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+            Your web browser must have JavaScript enabled in order for this application to display correctly.</div>
     </noscript>
 
-  </body>
+</body>
 </html>
