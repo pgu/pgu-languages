@@ -8,11 +8,19 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>initServlet</servlet-name>
-    <servlet-class>com.pgu.server.InitServiceImpl</servlet-class>
+    <servlet-class>com.pgu.server.rpc.InitServiceImpl</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>gameServlet</servlet-name>
-    <servlet-class>com.pgu.server.GameServiceImpl</servlet-class>
+    <servlet-class>com.pgu.server.rpc.GameServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>loginServlet</servlet-name>
+    <servlet-class>com.pgu.server.rpc.LoginServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>loginGoogleServlet</servlet-name>
+    <servlet-class>com.pgu.server.servlet.LoginGoogleServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -22,6 +30,14 @@
   <servlet-mapping>
     <servlet-name>gameServlet</servlet-name>
     <url-pattern>/pgu_languages/game</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginServlet</servlet-name>
+    <url-pattern>/pgu_languages/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginGoogleServlet</servlet-name>
+    <url-pattern>/logingoogle</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

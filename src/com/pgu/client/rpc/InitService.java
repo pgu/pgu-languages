@@ -1,4 +1,4 @@
-package com.pgu.client;
+package com.pgu.client.rpc;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;

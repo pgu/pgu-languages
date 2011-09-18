@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -27,14 +28,22 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.pgu.client.app.AsyncCallbackApp;
+import com.pgu.client.rpc.GameService;
+import com.pgu.client.rpc.GameServiceAsync;
+import com.pgu.client.rpc.InitService;
+import com.pgu.client.rpc.InitServiceAsync;
+import com.pgu.client.rpc.LoginService;
+import com.pgu.client.rpc.LoginServiceAsync;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
+import com.pgu.shared.UserAccount;
 
 public class Pgu_languages implements EntryPoint {
 
     InitServiceAsync initService = GWT.create(InitService.class);
     GameServiceAsync gameService = GWT.create(GameService.class);
+    LoginServiceAsync loginService = GWT.create(LoginService.class);
 
     private int N = 4;
 
@@ -51,6 +60,8 @@ public class Pgu_languages implements EntryPoint {
     final FlexTable ftDebug = new FlexTable();
     Label timeSpent = new Label("00:00");
 
+    final HorizontalPanel hp = new HorizontalPanel();
+
     @Override
     public void onModuleLoad() {
 
@@ -65,21 +76,13 @@ public class Pgu_languages implements EntryPoint {
         vp.add(hpFilters);
         vp.add(btnResetGame);
 
-        final DisclosurePanel dp = new DisclosurePanel("Admin");
-        final FlowPanel fp = new FlowPanel();
-        fp.add(btnDeleteData);
-        fp.add(btnInitData);
-        dp.add(fp);
-
         final FlowPanel fp2 = new FlowPanel();
         fp2.add(ft);
         fp2.add(timeSpent);
 
-        final HorizontalPanel hp = new HorizontalPanel();
         hp.add(fp2);
         hp.add(vp);
         hp.add(ftDebug);
-        hp.add(dp);
 
         hp.setSpacing(20);
 
@@ -88,8 +91,11 @@ public class Pgu_languages implements EntryPoint {
 
         formatBoard();
 
+        // pour admin getLoggedInUser()
+        getLoggedInUser();
         setActionInitData();
         setActionDeleteData();
+
         setActionInitGame();
         setActionResetGame();
 
@@ -104,6 +110,81 @@ public class Pgu_languages implements EntryPoint {
         styleTS.setProperty("marginLeft", "auto");
         styleTS.setProperty("marginRight", "auto");
         styleTS.setWidth(30, Unit.PX);
+    }
+
+    private void getLoggedInUser() {
+        loginService.getLoggedInUser(new AsyncCallbackApp<UserAccount>() {
+
+            @Override
+            public void onSuccess(final UserAccount loggedInUser) {
+                if (null == loggedInUser) {
+                    showLoginView();
+                } else {
+                    setCurrentUser(loggedInUser);
+                    goAfterLogin();
+                }
+            }
+
+            private void setCurrentUser(final UserAccount loggedInUser) {
+                // TODO PGU
+            }
+
+        });
+    }
+
+    final Button btnFacebook = new Button("Facebook");
+    final Button btnGoogle = new Button("Google");
+    final Button btnTwitter = new Button("Twitter");
+
+    private void showLoginView() {
+        final FlowPanel fp = new FlowPanel();
+        fp.add(btnFacebook);
+        fp.add(btnGoogle);
+        fp.add(btnTwitter);
+        hp.add(fp);
+
+        setActionLoginFacebook();
+        setActionLoginGoogle();
+        setActionLoginTwitter();
+    }
+
+    private void setActionLoginFacebook() {
+        btnFacebook.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                Window.Location.assign("/loginfacebook");
+            }
+        });
+    }
+
+    private void setActionLoginGoogle() {
+        btnGoogle.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                Window.Location.assign("/logingoogle");
+            }
+        });
+    }
+
+    private void setActionLoginTwitter() {
+        btnFacebook.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                Window.Location.assign("/logintwitter");
+            }
+        });
+    }
+
+    private void goAfterLogin() {
+        final DisclosurePanel dp = new DisclosurePanel("Admin");
+        final FlowPanel fp = new FlowPanel();
+        fp.add(btnDeleteData);
+        fp.add(btnInitData);
+        dp.add(fp);
+        hp.add(dp);
     }
 
     private void setActionResetGame() {

@@ -1,4 +1,4 @@
-package com.pgu.client;
+package com.pgu.client.rpc;
 
 import java.util.List;
 

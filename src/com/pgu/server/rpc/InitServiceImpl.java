@@ -1,11 +1,12 @@
-package com.pgu.server;
+package com.pgu.server.rpc;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Objectify;
-import com.pgu.client.InitService;
+import com.pgu.client.rpc.InitService;
+import com.pgu.server.dao.ObjectifyDao;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
 

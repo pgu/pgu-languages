@@ -1,4 +1,4 @@
-package com.pgu.server;
+package com.pgu.server.rpc;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -7,7 +7,8 @@ import java.util.Random;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Objectify;
-import com.pgu.client.GameService;
+import com.pgu.client.rpc.GameService;
+import com.pgu.server.dao.ObjectifyDao;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 
