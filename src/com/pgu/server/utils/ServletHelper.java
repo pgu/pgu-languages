@@ -8,13 +8,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.google.appengine.api.utils.SystemProperty;
+import com.googlecode.objectify.Objectify;
+import com.pgu.server.dao.ObjectifyDao;
+import com.pgu.shared.UserAccount;
+import com.pgu.shared.UserAccount.ProviderAuth;
 
 public class ServletHelper {
 
     public enum Attributes {
-        REQUEST_TOKEN, FACEBOOK_CODE
+        REQUEST_TOKEN, FACEBOOK_CODE, USER_ID
     }
 
     public static String getApplicationURL(final HttpServletRequest request) {
@@ -88,6 +93,35 @@ public class ServletHelper {
             } catch (final Exception e) {
             }
         }
+    }
+
+    public static void setUserInDBAndSession(final UserAccount userFromProvider, final HttpServletRequest request) {
+        final ProviderAuth userProviderAuth = userFromProvider.getProviderAuth();
+        final Objectify ofy = ObjectifyDao.ofy();
+
+        UserAccount uDB = null;
+        if (ProviderAuth.GOOGLE == userProviderAuth) {
+            uDB = ofy.query(UserAccount.class)//
+                    .filter("name", userFromProvider.getName()) //
+                    .filter("providerAuth", ProviderAuth.GOOGLE) //
+                    .get();
+        } else {
+            uDB = ofy.find(UserAccount.class, userFromProvider.getId());
+        }
+
+        // //////////////////
+        if (null == uDB) {
+            ofy.put(userFromProvider);
+            uDB = userFromProvider;
+        }
+
+        // //////////////////
+        final HttpSession session = request.getSession();
+        session.setAttribute(Attributes.USER_ID.toString(), uDB.getId());
+        session.setAttribute("loggedin", true);
+
+        System.out.println("User id:" + uDB.getId() + ", " + uDB.getName());
+
     }
 
 }

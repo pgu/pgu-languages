@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -38,6 +39,7 @@ import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
 import com.pgu.shared.UserAccount;
+import com.pgu.shared.UserAccount.ProviderAuth;
 
 public class Pgu_languages implements EntryPoint {
 
@@ -57,10 +59,15 @@ public class Pgu_languages implements EntryPoint {
     final FlexTable ft = new FlexTable();
     final Button btnDeleteData = new Button("deleteData");
     final Button btnInitData = new Button("initData");
+    final Button btnLogout = new Button("logout");
     final FlexTable ftDebug = new FlexTable();
     Label timeSpent = new Label("00:00");
+    InlineLabel accountName = new InlineLabel();
+    InlineLabel accountProvider = new InlineLabel();
 
     final HorizontalPanel hp = new HorizontalPanel();
+    final DisclosurePanel adminPanel = new DisclosurePanel("Admin");
+    final FlowPanel fpPlayer = new FlowPanel();
 
     @Override
     public void onModuleLoad() {
@@ -84,6 +91,15 @@ public class Pgu_languages implements EntryPoint {
         hp.add(vp);
         hp.add(ftDebug);
 
+        loginPanel.add(btnFacebook);
+        loginPanel.add(btnGoogle);
+        loginPanel.add(btnTwitter);
+        hp.add(loginPanel);
+
+        setActionLoginFacebook();
+        setActionLoginGoogle();
+        setActionLoginTwitter();
+
         hp.setSpacing(20);
 
         RootPanel.get().add(hp);
@@ -91,10 +107,23 @@ public class Pgu_languages implements EntryPoint {
 
         formatBoard();
 
-        // pour admin getLoggedInUser()
-        getLoggedInUser();
+        fpPlayer.add(new InlineLabel("Account: "));
+        fpPlayer.add(accountName);
+        fpPlayer.add(accountProvider);
+        fpPlayer.add(btnLogout);
+        hp.add(fpPlayer);
+
+        final FlowPanel fpAdmin = new FlowPanel();
+        fpAdmin.add(btnDeleteData);
+        fpAdmin.add(btnInitData);
+        adminPanel.add(fpAdmin);
+        hp.add(adminPanel);
+
         setActionInitData();
         setActionDeleteData();
+        setActionLogout();
+
+        getLoggedInUser();
 
         setActionInitGame();
         setActionResetGame();
@@ -110,7 +139,10 @@ public class Pgu_languages implements EntryPoint {
         styleTS.setProperty("marginLeft", "auto");
         styleTS.setProperty("marginRight", "auto");
         styleTS.setWidth(30, Unit.PX);
+
     }
+
+    private UserAccount user;
 
     private void getLoggedInUser() {
         loginService.getLoggedInUser(new AsyncCallbackApp<UserAccount>() {
@@ -126,7 +158,7 @@ public class Pgu_languages implements EntryPoint {
             }
 
             private void setCurrentUser(final UserAccount loggedInUser) {
-                // TODO PGU
+                user = loggedInUser;
             }
 
         });
@@ -136,16 +168,14 @@ public class Pgu_languages implements EntryPoint {
     final Button btnGoogle = new Button("Google");
     final Button btnTwitter = new Button("Twitter");
 
-    private void showLoginView() {
-        final FlowPanel fp = new FlowPanel();
-        fp.add(btnFacebook);
-        fp.add(btnGoogle);
-        fp.add(btnTwitter);
-        hp.add(fp);
+    final FlowPanel loginPanel = new FlowPanel();
 
-        setActionLoginFacebook();
-        setActionLoginGoogle();
-        setActionLoginTwitter();
+    private void showLoginView() {
+        loginPanel.setVisible(true);
+        adminPanel.setVisible(false);
+        fpPlayer.setVisible(false);
+        accountName.setText("");
+        accountProvider.setText("");
     }
 
     private void setActionLoginFacebook() {
@@ -169,7 +199,7 @@ public class Pgu_languages implements EntryPoint {
     }
 
     private void setActionLoginTwitter() {
-        btnFacebook.addClickHandler(new ClickHandler() {
+        btnTwitter.addClickHandler(new ClickHandler() {
 
             @Override
             public void onClick(final ClickEvent event) {
@@ -179,12 +209,40 @@ public class Pgu_languages implements EntryPoint {
     }
 
     private void goAfterLogin() {
-        final DisclosurePanel dp = new DisclosurePanel("Admin");
-        final FlowPanel fp = new FlowPanel();
-        fp.add(btnDeleteData);
-        fp.add(btnInitData);
-        dp.add(fp);
-        hp.add(dp);
+        loginPanel.setVisible(false);
+        fpPlayer.setVisible(true);
+        accountName.setText(user.getName());
+        accountProvider.setText(user.getProviderAuth().toString());
+
+        loginService.isAdmin(user, new AsyncCallbackApp<Boolean>() {
+
+            @Override
+            public void onSuccess(final Boolean isAdmin) {
+                adminPanel.setVisible(isAdmin);
+            }
+
+        });
+    }
+
+    private void setActionLogout() {
+        btnLogout.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                if (ProviderAuth.FACEBOOK == user.getProviderAuth()) {
+                    Window.Location.assign("/facebooklogout.jsp");
+                } else {
+                    loginService.logout(new AsyncCallbackApp<Void>() {
+
+                        @Override
+                        public void onSuccess(final Void result) {
+                            GWT.log("logout");
+                            showLoginView();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void setActionResetGame() {

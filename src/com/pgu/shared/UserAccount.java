@@ -1,80 +1,53 @@
 package com.pgu.shared;
 
 import javax.persistence.Id;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.googlecode.objectify.Objectify;
-import com.pgu.server.dao.ObjectifyDao;
 
 public class UserAccount implements IsSerializable {
 
     public enum ProviderAuth {
         GOOGLE {
             @Override
-            public void setUserInDBAndSession(final String id, final String name, final HttpServletRequest request) {
+            public UserAccount get(final String id, final String name) {
                 final UserAccount u = new UserAccount();
                 u.setId(null);
                 u.setProviderAuth(this);
                 u.setName(name);
-
-                final Objectify ofy = ObjectifyDao.ofy();
-                final UserAccount uDB = ofy.query(UserAccount.class)//
-                        .filter("name", u.getName()) //
-                        .filter("providerAuth", ProviderAuth.GOOGLE) //
-                        .get();
-                setUserInSession(u, ofy, uDB, request);
+                return u;
             }
         }, //
         FACEBOOK {
             @Override
-            public void setUserInDBAndSession(final String id, final String name, final HttpServletRequest request) {
+            public UserAccount get(final String id, final String name) {
                 final UserAccount u = new UserAccount();
                 u.setId(Long.parseLong(id));
                 u.setProviderAuth(this);
                 u.setName(name);
-
-                final Objectify ofy = ObjectifyDao.ofy();
-                final UserAccount uDB = ofy.get(UserAccount.class, u.getId());
-                setUserInSession(u, ofy, uDB, request);
+                return u;
             }
 
         }, //
         TWITTER {
             @Override
-            public void setUserInDBAndSession(final String id, final String name, final HttpServletRequest request) {
+            public UserAccount get(final String id, final String name) {
                 final UserAccount u = new UserAccount();
                 u.setId(Long.parseLong(id));
                 u.setProviderAuth(this);
                 u.setName(name);
-
-                final Objectify ofy = ObjectifyDao.ofy();
-                final UserAccount uDB = ofy.get(UserAccount.class, u.getId());
-                setUserInSession(u, ofy, uDB, request);
+                return u;
             }
         };
 
-        public abstract void setUserInDBAndSession(final String id, final String name, HttpServletRequest request);
+        public abstract UserAccount get(final String id, final String name);
 
-        public void setUserInSession(final UserAccount u, final Objectify ofy, UserAccount uDB,
-                final HttpServletRequest request) {
-            if (null == uDB) {
-                ofy.put(u);
-                uDB = u;
-            }
-            final HttpSession session = request.getSession();
-            session.setAttribute("userId", uDB.getId());
-            session.setAttribute("loggedin", true);
-
-            System.out.println("User id:" + uDB.getId() + ", " + uDB.getName());
-        }
     }
 
     @Id
     private Long id;
     private String name;
     private ProviderAuth providerAuth;
+    private String lastActive;
 
     public UserAccount() {
     }
@@ -106,6 +79,14 @@ public class UserAccount implements IsSerializable {
 
     public void setProviderAuth(final ProviderAuth providerAuth) {
         this.providerAuth = providerAuth;
+    }
+
+    public void setLastActive(final String date) {
+        lastActive = date;
+    }
+
+    public String getLastActive() {
+        return lastActive;
     }
 
 }

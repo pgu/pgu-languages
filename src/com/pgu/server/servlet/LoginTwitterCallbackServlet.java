@@ -17,6 +17,7 @@ import twitter4j.auth.RequestToken;
 
 import com.pgu.server.utils.ConfigApp;
 import com.pgu.server.utils.ServletHelper;
+import com.pgu.shared.UserAccount;
 import com.pgu.shared.UserAccount.ProviderAuth;
 
 public class LoginTwitterCallbackServlet extends HttpServlet {
@@ -46,7 +47,9 @@ public class LoginTwitterCallbackServlet extends HttpServlet {
 
         request.getSession().removeAttribute(REQUEST_TOKEN.toString());
 
-        ProviderAuth.TWITTER.setUserInDBAndSession(Long.toString(userTwitter.getId()), userTwitter.getName(), request);
+        final UserAccount userFromProvider = ProviderAuth.TWITTER.get(Long.toString(userTwitter.getId()),
+                userTwitter.getName());
+        ServletHelper.setUserInDBAndSession(userFromProvider, request);
 
         response.sendRedirect(ServletHelper.getApplicationURL(request));
 

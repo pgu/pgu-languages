@@ -7,37 +7,73 @@
   
   <!-- Servlets -->
   <servlet>
-    <servlet-name>initServlet</servlet-name>
+    <servlet-name>initService</servlet-name>
     <servlet-class>com.pgu.server.rpc.InitServiceImpl</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>gameServlet</servlet-name>
+    <servlet-name>gameService</servlet-name>
     <servlet-class>com.pgu.server.rpc.GameServiceImpl</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>loginServlet</servlet-name>
+    <servlet-name>loginService</servlet-name>
     <servlet-class>com.pgu.server.rpc.LoginServiceImpl</servlet-class>
   </servlet>
+  
   <servlet>
     <servlet-name>loginGoogleServlet</servlet-name>
     <servlet-class>com.pgu.server.servlet.LoginGoogleServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>loginFacebookServlet</servlet-name>
+    <servlet-class>com.pgu.server.servlet.LoginFacebookServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>loginTwitterServlet</servlet-name>
+    <servlet-class>com.pgu.server.servlet.LoginTwitterServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>loginGoogleCallbackServlet</servlet-name>
+    <servlet-class>com.pgu.server.servlet.LoginGoogleCallbackServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>loginTwitterCallbackServlet</servlet-name>
+    <servlet-class>com.pgu.server.servlet.LoginTwitterCallbackServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
-    <servlet-name>initServlet</servlet-name>
+    <servlet-name>initService</servlet-name>
     <url-pattern>/pgu_languages/init</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>gameServlet</servlet-name>
+    <servlet-name>gameService</servlet-name>
     <url-pattern>/pgu_languages/game</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>loginServlet</servlet-name>
+    <servlet-name>loginService</servlet-name>
     <url-pattern>/pgu_languages/login</url-pattern>
   </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>loginGoogleServlet</servlet-name>
     <url-pattern>/logingoogle</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginFacebookServlet</servlet-name>
+    <url-pattern>/loginfacebook</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginTwitterServlet</servlet-name>
+    <url-pattern>/logintwitter</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>loginGoogleCallbackServlet</servlet-name>
+    <url-pattern>/logingooglecallback</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginTwitterCallbackServlet</servlet-name>
+    <url-pattern>/logintwittercallback</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

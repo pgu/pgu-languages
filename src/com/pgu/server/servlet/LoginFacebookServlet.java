@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import com.pgu.server.utils.ConfigApp;
 import com.pgu.server.utils.ServletHelper;
 import com.pgu.server.utils.StringHelper;
+import com.pgu.shared.UserAccount;
 import com.pgu.shared.UserAccount.ProviderAuth;
 
 public class LoginFacebookServlet extends HttpServlet {
@@ -37,10 +38,14 @@ public class LoginFacebookServlet extends HttpServlet {
 
             final String tokenURL = "https://graph.facebook.com/oauth/access_token" + //
                     "?client_id=%s" + //
+                    "&redirect_uri=%s" + //
                     "&client_secret=%s" + //
-                    "&code=%s" + //
-                    "&redirect_uri=%s";
-            String resp = ServletHelper.getResponse(String.format(tokenURL, appId, clientSecret, code, callbackURL));
+                    "&code=%s";
+            String resp = ServletHelper.getResponse(String.format(tokenURL, //
+                    appId, //
+                    callbackURL, //
+                    clientSecret, //
+                    code));
 
             final int beginIndex = "access_token=".length();
             final String token = resp.substring(beginIndex);
@@ -53,7 +58,10 @@ public class LoginFacebookServlet extends HttpServlet {
                 final String first = j.getString("first_name");
                 final String last = j.getString("last_name");
                 final String id = j.getString("id");
-                ProviderAuth.FACEBOOK.setUserInDBAndSession(id, first + " " + last, request);
+
+                final UserAccount userFromProvider = ProviderAuth.FACEBOOK.get(id, first + " " + last);
+                ServletHelper.setUserInDBAndSession(userFromProvider, request);
+
             } catch (final JSONException e) {
                 e.printStackTrace();
             }

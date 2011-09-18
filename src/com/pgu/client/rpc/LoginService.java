@@ -9,4 +9,8 @@ public interface LoginService extends RemoteService {
 
     UserAccount getLoggedInUser();
 
+    void logout();
+
+    boolean isAdmin(UserAccount user);
+
 }
