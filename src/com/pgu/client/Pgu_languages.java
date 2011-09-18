@@ -35,6 +35,8 @@ import com.pgu.client.rpc.InitService;
 import com.pgu.client.rpc.InitServiceAsync;
 import com.pgu.client.rpc.LoginService;
 import com.pgu.client.rpc.LoginServiceAsync;
+import com.pgu.client.rpc.PlayerService;
+import com.pgu.client.rpc.PlayerServiceAsync;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
@@ -46,6 +48,7 @@ public class Pgu_languages implements EntryPoint {
     InitServiceAsync initService = GWT.create(InitService.class);
     GameServiceAsync gameService = GWT.create(GameService.class);
     LoginServiceAsync loginService = GWT.create(LoginService.class);
+    PlayerServiceAsync playerService = GWT.create(PlayerService.class);
 
     private int N = 4;
 
@@ -62,12 +65,13 @@ public class Pgu_languages implements EntryPoint {
     final Button btnLogout = new Button("logout");
     final FlexTable ftDebug = new FlexTable();
     Label timeSpent = new Label("00:00");
-    InlineLabel accountName = new InlineLabel();
-    InlineLabel accountProvider = new InlineLabel();
+    InlineLabel playerName = new InlineLabel();
+    Label playerProvider = new Label();
+    Label playerScore = new Label();
 
     final HorizontalPanel hp = new HorizontalPanel();
     final DisclosurePanel adminPanel = new DisclosurePanel("Admin");
-    final FlowPanel fpPlayer = new FlowPanel();
+    final FlowPanel playerPanel = new FlowPanel();
 
     @Override
     public void onModuleLoad() {
@@ -107,11 +111,13 @@ public class Pgu_languages implements EntryPoint {
 
         formatBoard();
 
-        fpPlayer.add(new InlineLabel("Account: "));
-        fpPlayer.add(accountName);
-        fpPlayer.add(accountProvider);
-        fpPlayer.add(btnLogout);
-        hp.add(fpPlayer);
+        playerPanel.add(new InlineLabel("Account: "));
+        playerPanel.add(playerName);
+        playerPanel.add(playerProvider);
+        playerPanel.add(new InlineLabel("Score: "));
+        playerPanel.add(playerScore);
+        playerPanel.add(btnLogout);
+        hp.add(playerPanel);
 
         final FlowPanel fpAdmin = new FlowPanel();
         fpAdmin.add(btnDeleteData);
@@ -173,9 +179,10 @@ public class Pgu_languages implements EntryPoint {
     private void showLoginView() {
         loginPanel.setVisible(true);
         adminPanel.setVisible(false);
-        fpPlayer.setVisible(false);
-        accountName.setText("");
-        accountProvider.setText("");
+        playerPanel.setVisible(false);
+        playerName.setText("");
+        playerScore.setText("");
+        playerProvider.setText("");
     }
 
     private void setActionLoginFacebook() {
@@ -210,9 +217,9 @@ public class Pgu_languages implements EntryPoint {
 
     private void goAfterLogin() {
         loginPanel.setVisible(false);
-        fpPlayer.setVisible(true);
-        accountName.setText(user.getName());
-        accountProvider.setText(user.getProviderAuth().toString());
+        playerPanel.setVisible(true);
+        playerName.setText(user.getName());
+        playerProvider.setText(user.getProviderAuth().toString());
 
         loginService.isAdmin(user, new AsyncCallbackApp<Boolean>() {
 
@@ -221,6 +228,14 @@ public class Pgu_languages implements EntryPoint {
                 adminPanel.setVisible(isAdmin);
             }
 
+        });
+
+        playerService.getScore(user, new AsyncCallbackApp<Integer>() {
+
+            @Override
+            public void onSuccess(final Integer result) {
+                playerScore.setText("" + result);
+            }
         });
     }
 

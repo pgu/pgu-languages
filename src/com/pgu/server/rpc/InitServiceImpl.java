@@ -10,8 +10,9 @@ import com.pgu.server.dao.ObjectifyDao;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
 
-@SuppressWarnings("serial")
 public class InitServiceImpl extends RemoteServiceServlet implements InitService {
+
+    private static final long serialVersionUID = -7873557792672762717L;
 
     @Override
     public void initData() {

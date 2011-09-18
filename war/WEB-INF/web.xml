@@ -18,6 +18,10 @@
     <servlet-name>loginService</servlet-name>
     <servlet-class>com.pgu.server.rpc.LoginServiceImpl</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>playerService</servlet-name>
+    <servlet-class>com.pgu.server.rpc.PlayerServiceImpl</servlet-class>
+  </servlet>
   
   <servlet>
     <servlet-name>loginGoogleServlet</servlet-name>
@@ -53,6 +57,10 @@
     <servlet-name>loginService</servlet-name>
     <url-pattern>/pgu_languages/login</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>playerService</servlet-name>
+    <url-pattern>/pgu_languages/player</url-pattern>
+  </servlet-mapping>
   
   <servlet-mapping>
     <servlet-name>loginGoogleServlet</servlet-name>
@@ -76,6 +84,17 @@
     <url-pattern>/logintwittercallback</url-pattern>
   </servlet-mapping>
   
+  <!-- filter -->
+  <filter>
+    <filter-name>loginfilter</filter-name>
+    <filter-class>com.pgu.server.servlet.LoginFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>loginfilter</filter-name>
+    <url-pattern>/pgu_languages/player</url-pattern>
+  </filter-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Pgu_languages.html</welcome-file>

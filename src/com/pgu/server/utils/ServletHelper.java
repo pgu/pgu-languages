@@ -19,17 +19,15 @@ import com.pgu.shared.UserAccount.ProviderAuth;
 public class ServletHelper {
 
     public enum Attributes {
-        REQUEST_TOKEN, FACEBOOK_CODE, USER_ID
+        REQUEST_TOKEN, FACEBOOK_CODE, USER_ID, IS_LOGGED_IN
     }
 
     public static String getApplicationURL(final HttpServletRequest request) {
-
         if (ServletHelper.isDevelopment(request)) {
             return "http://127.0.0.1:8888/Pgu_languages.html?gwt.codesvr=127.0.0.1:9997";
         } else {
             return ServletHelper.getBaseUrl(request);
         }
-
     }
 
     public static String getResponse(final String thisUrl) {
@@ -73,7 +71,8 @@ public class ServletHelper {
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final byte ba[] = new byte[8192];
-            int read = is.read(ba);
+            int read;
+            read = is.read(ba);
             while (read > -1) {
                 out.write(ba, 0, read);
                 read = is.read(ba);
@@ -83,24 +82,25 @@ public class ServletHelper {
                 returnString = "[{}]";
             }
             return returnString;
-        } catch (final Exception e) {
-            return null;
+        } catch (final IOException e) {
+            e.printStackTrace();
         } finally {
-            try {
-                if (is != null) {
+            if (is != null) {
+                try {
                     is.close();
+                } catch (final IOException e) {
+                    // fail silently
                 }
-            } catch (final Exception e) {
             }
         }
+        return "";
     }
 
     public static void setUserInDBAndSession(final UserAccount userFromProvider, final HttpServletRequest request) {
-        final ProviderAuth userProviderAuth = userFromProvider.getProviderAuth();
         final Objectify ofy = ObjectifyDao.ofy();
 
         UserAccount uDB = null;
-        if (ProviderAuth.GOOGLE == userProviderAuth) {
+        if (ProviderAuth.GOOGLE == userFromProvider.getProviderAuth()) {
             uDB = ofy.query(UserAccount.class)//
                     .filter("name", userFromProvider.getName()) //
                     .filter("providerAuth", ProviderAuth.GOOGLE) //
@@ -118,10 +118,26 @@ public class ServletHelper {
         // //////////////////
         final HttpSession session = request.getSession();
         session.setAttribute(Attributes.USER_ID.toString(), uDB.getId());
-        session.setAttribute("loggedin", true);
+        session.setAttribute(Attributes.IS_LOGGED_IN.toString(), true);
+    }
 
-        System.out.println("User id:" + uDB.getId() + ", " + uDB.getName());
+    public static boolean isLoggedIn(final HttpServletRequest req) {
 
+        if (req == null) {
+            return false;
+        }
+
+        final HttpSession session = req.getSession();
+        if (session == null) {
+            return false;
+        }
+
+        final Boolean isLoggedIn = (Boolean) session.getAttribute(Attributes.IS_LOGGED_IN.toString());
+        if (isLoggedIn == null) {
+            return false;
+        }
+
+        return isLoggedIn;
     }
 
 }

@@ -37,13 +37,11 @@ public class LoginTwitterCallbackServlet extends HttpServlet {
 
         User userTwitter = null;
         try {
-            twitter.getOAuthAccessToken(token, verifier); // TODO PGU util?
+            twitter.getOAuthAccessToken(token, verifier);
             userTwitter = twitter.verifyCredentials();
         } catch (final TwitterException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Twitter user found:" + userTwitter.getName());
 
         request.getSession().removeAttribute(REQUEST_TOKEN.toString());
 

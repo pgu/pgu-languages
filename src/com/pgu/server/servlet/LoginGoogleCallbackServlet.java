@@ -23,8 +23,6 @@ public class LoginGoogleCallbackServlet extends HttpServlet {
         if (googleUser != null) {
             final UserAccount userFromProvider = ProviderAuth.GOOGLE.get(null, googleUser.getName());
             ServletHelper.setUserInDBAndSession(userFromProvider, request);
-        } else {
-            System.out.println("googleUser is not found");
         }
         response.sendRedirect(ServletHelper.getApplicationURL(request));
 

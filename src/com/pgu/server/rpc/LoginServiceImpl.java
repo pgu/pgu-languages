@@ -12,8 +12,9 @@ import com.pgu.server.dao.ObjectifyDao;
 import com.pgu.server.utils.ServletHelper.Attributes;
 import com.pgu.shared.UserAccount;
 
-@SuppressWarnings("serial")
 public class LoginServiceImpl extends RemoteServiceServlet implements LoginService {
+
+    private static final long serialVersionUID = 1968438698848800288L;
 
     private final SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
 

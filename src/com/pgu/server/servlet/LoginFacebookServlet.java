@@ -1,9 +1,6 @@
 package com.pgu.server.servlet;
 
-import static com.pgu.server.utils.ServletHelper.Attributes.FACEBOOK_CODE;
-
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,8 +30,7 @@ public class LoginFacebookServlet extends HttpServlet {
         final String code = request.getParameter("code");
 
         if (!StringHelper.isEmpty(code)) {
-            System.out.println("params " + getParams(request));
-            request.getSession().setAttribute(FACEBOOK_CODE.toString(), code);
+            // request.getSession().setAttribute(Attributes.FACEBOOK_CODE.toString(), code); TODO PGU util?
 
             final String tokenURL = "https://graph.facebook.com/oauth/access_token" + //
                     "?client_id=%s" + //
@@ -77,16 +73,6 @@ public class LoginFacebookServlet extends HttpServlet {
                     callbackURL//
                     ));
         }
-    }
-
-    private static String getParams(final HttpServletRequest request) {
-        final Enumeration<?> all = request.getParameterNames();
-        String msg = "";
-        while (all.hasMoreElements()) {
-            final String key = (String) all.nextElement();
-            msg += key + " = " + request.getParameter(key) + "<br/>\n";
-        }
-        return msg;
     }
 
 }

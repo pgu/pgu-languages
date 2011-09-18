@@ -12,13 +12,12 @@ import com.pgu.server.dao.ObjectifyDao;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 
-@SuppressWarnings("serial")
 public class GameServiceImpl extends RemoteServiceServlet implements GameService {
+
+    private static final long serialVersionUID = -184464224355950013L;
 
     @Override
     public List<Symbol> initGame(final GameConfig gc) {
-        System.out.println(gc);
-
         final Objectify ofy = ObjectifyDao.ofy();
 
         final List<Symbol> symbs = ofy.query(Symbol.class).filter("group", gc.group).list();

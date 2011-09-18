@@ -36,15 +36,10 @@ public class LoginTwitterServlet extends HttpServlet {
             request.getSession().setAttribute(REQUEST_TOKEN.toString(), token);
 
             final String loginURL = token.getAuthenticationURL() + "&force_login=true";
-            System.out.println("Redirecting to: " + loginURL);
             response.sendRedirect(loginURL);
 
         } catch (final TwitterException e) {
-            response.setContentType("text/html");
-            response.getWriter().print("twitter exception<br/>");
-            response.getWriter().print("<p>" + e.getMessage() + "</p>");
-            response.getWriter().print("not found");
-            return;
+            e.printStackTrace();
         }
 
     }

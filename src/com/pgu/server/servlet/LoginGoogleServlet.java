@@ -21,7 +21,6 @@ public class LoginGoogleServlet extends HttpServlet {
         final String callbackURL = ServletHelper.buildCallBackURL(request);
         final UserService userService = UserServiceFactory.getUserService();
         final String googleLoginUrl = userService.createLoginURL(callbackURL);
-        System.out.println("Going to Google login URL: " + googleLoginUrl);
         response.sendRedirect(googleLoginUrl);
     }
 
