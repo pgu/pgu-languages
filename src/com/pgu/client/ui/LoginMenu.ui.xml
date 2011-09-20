@@ -1,0 +1,10 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <g:HTMLPanel  ui:field="container">
+        <g:HTML ui:field="facebook" text="Facebook"></g:HTML>
+        <g:HTML ui:field="twitter" text="Twitter"></g:HTML>
+        <g:HTML ui:field="google" text="Google"></g:HTML>
+    </g:HTMLPanel>
+    
+</ui:UiBinder> 

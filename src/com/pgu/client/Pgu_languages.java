@@ -36,7 +36,7 @@ import com.pgu.client.rpc.LoginService;
 import com.pgu.client.rpc.LoginServiceAsync;
 import com.pgu.client.rpc.PlayerService;
 import com.pgu.client.rpc.PlayerServiceAsync;
-import com.pgu.client.ui.MenuGame;
+import com.pgu.client.ui.Menu;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
@@ -125,7 +125,7 @@ public class Pgu_languages implements EntryPoint {
         styleTS.setProperty("marginRight", "auto");
         styleTS.setWidth(30, Unit.PX);
 
-        RootPanel.get().add(new MenuGame());
+        RootPanel.get().add(new Menu());
     }
 
     private void addPlayerPanel() {

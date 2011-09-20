@@ -3,6 +3,52 @@
 /* increase font size */
 /* display:block; for important area + more padding */
 /* :hover -> :active */
-#menuGame {
-    background-color: black;
+#pgu-tag {
+    background-color: whitesmoke; 
+}
+
+#pgu-container-login {
+    display: inline-block;
+    width: 60px;
+    border: 1px solid black;
+    cursor: default;
+}
+#pgu-login {
+    text-align: center;
+    width: 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#pgu-container-start {
+    display: inline-block;
+    width: 60px;
+    border: 1px solid black;
+}
+#pgu-start {
+    text-align: center;
+    width: 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#pgu-container-stop {
+    display: inline-block;
+    width: 60px;
+    border: 1px solid black;
+}
+#pgu-stop {
+    text-align: center;
+    width: 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#pgu-container-options {
+    display: inline-block;
+    width: 60px;
+    border: 1px solid black;
+}
+#pgu-options {
+    text-align: center;
+    width: 40px;
+    margin-left: auto;
+    margin-right: auto;
 }
