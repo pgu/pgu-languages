@@ -2,8 +2,16 @@
     background-color: whitesmoke; 
 }
 
-#pgu-start {
+#pgu-start-btn {
     color: grey; 
+}
+
+#pgu-container-start-btn:hover {
+    background-color: lightgrey;
+}
+
+#pgu-container-stop-btn:hover {
+    background-color: lightgrey;
 }
 
 #pgu-container-login-btn:hover {
