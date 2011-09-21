@@ -26,6 +26,7 @@
     cursor: pointer;
 }
 #pgu-start {
+    color: pink;
     text-align: center;
     width: 40px;
     margin-left: auto;
@@ -56,6 +57,7 @@
     margin-right: auto;
 }
 #pgu-container-login-menu {
+    width: 60px;
     border: 1px solid black;
     position: absolute;
     left: 0px;
@@ -63,4 +65,13 @@
 #pgu-container-login-panel {
     display: inline-block;
     position: relative;
+}
+#pgu-facebook {
+    cursor: pointer;
+}
+#pgu-twitter {
+    cursor: pointer;
+}
+#pgu-google {
+    cursor: pointer;
 }

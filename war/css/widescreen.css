@@ -5,3 +5,17 @@
 #pgu-start {
     color: grey; 
 }
+
+#pgu-container-login-btn:hover {
+    background-color: lightgrey;
+}
+#pgu-facebook:hover {
+    background-color: lightgrey;
+}
+#pgu-twitter:hover {
+    background-color: lightgrey;
+}
+#pgu-google:hover {
+    background-color: lightgrey;
+}
+
