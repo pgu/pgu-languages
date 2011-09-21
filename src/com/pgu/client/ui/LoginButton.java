@@ -1,8 +1,6 @@
 package com.pgu.client.ui;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -21,23 +19,13 @@ public class LoginButton extends Composite {
     HTMLPanel container;
     @UiField
     HTML login;
-    @UiField
-    LoginMenu loginMenu;
 
     public LoginButton() {
         initWidget(uiBinder.createAndBindUi(this));
-        loginMenu.setVisible(false);
 
-        UiHelper.id("container-login", container);
-        UiHelper.id("login", login);
+        UiHelper.id("container-login-btn", container);
+        UiHelper.id("login-btn", login);
 
-        container.addDomHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                loginMenu.setVisible(!loginMenu.isVisible());
-            }
-        }, ClickEvent.getType());
     }
 
 }

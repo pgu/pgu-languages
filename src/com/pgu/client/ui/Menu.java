@@ -23,7 +23,7 @@ public class Menu extends Composite {
     @UiField
     OptionsButton optionsBtn;
     @UiField
-    LoginButton loginBtn;
+    LoginPanel loginPanel;
 
     public Menu() {
         initWidget(uiBinder.createAndBindUi(this));

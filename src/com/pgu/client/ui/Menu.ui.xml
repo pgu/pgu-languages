@@ -4,7 +4,7 @@
     
     <g:HTMLPanel ui:field="container">
     
-        <pgu:LoginButton ui:field="loginBtn" />
+        <pgu:LoginPanel ui:field="loginPanel" />
         <pgu:StartButton ui:field="startBtn" />
         <pgu:StopButton ui:field="stopBtn" />
         <pgu:OptionsButton ui:field="optionsBtn" />
