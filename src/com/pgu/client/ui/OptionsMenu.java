@@ -1,5 +1,7 @@
 package com.pgu.client.ui;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -47,9 +49,17 @@ public class OptionsMenu extends Composite {
 
             @Override
             public void onChange(final ChangeEvent event) {
-                filter.updateAlphabet(Symbol.Group.valueOf(language.getValue(language.getSelectedIndex())));
+                filter.updateAlphabet(getCurrentGroup());
             }
         });
+    }
+
+    public Group getCurrentGroup() {
+        return Symbol.Group.valueOf(language.getValue(language.getSelectedIndex()));
+    }
+
+    public List<String> getFilters() {
+        return filter.getFilters();
     }
 
 }

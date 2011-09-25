@@ -6,7 +6,9 @@
         </g:HTMLPanel>
         <g:HTMLPanel ui:field="containerTimer">
             <g:HTMLPanel ui:field="timerPanel">
-                <g:HTML ui:field="minutes"></g:HTML>:<g:HTML ui:field="secondes"></g:HTML>
+                <g:HTML ui:field="minutes"></g:HTML>:<g:HTML ui:field="seconds"></g:HTML>
+            </g:HTMLPanel>
+            <g:HTMLPanel ui:field="help">
             </g:HTMLPanel>
         </g:HTMLPanel>
     </g:HTMLPanel>

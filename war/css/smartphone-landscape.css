@@ -34,13 +34,13 @@
     margin-right: auto;
 }
 
-#pgu-container-stop-btn {
+#pgu-container-reset-btn {
     display: inline-block;
     width: 60px;
     border: 1px solid black;
     cursor: pointer;
 }
-#pgu-stop-btn {
+#pgu-reset-btn {
     text-align: center;
     width: 40px;
     margin-left: auto;
@@ -102,6 +102,16 @@
     width: 40px;
     margin-left: auto;
     margin-right: auto;
+}
+
+#pgu-help {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid cyan;
+    cursor: pointer;
 }
 
 #pgu-minutes {

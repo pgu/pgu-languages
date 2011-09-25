@@ -1,5 +1,6 @@
 package com.pgu.client.ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,11 +30,18 @@ public class AlphabetFilter extends Composite {
 
     @UiField
     HTMLPanel container;
+    @UiField
+    HTMLPanel containerVowels;
+    @UiField
+    HTMLPanel containerConsonants;
 
-    private static List<String> JAPANESE_FILTERS = Arrays.asList("A", "E", "I", "O", "U", "K", "S", "T", "N", "H", "M",
-            "Y", "R", "W");
+    private static List<String> JAPANESE_FILTER_VOWELS = Arrays.asList("A", "E", "I", "O", "U");
+    private static List<String> JAPANESE_FILTER_CONSONANTS = Arrays.asList("-", "K", "S", "T", "N", "H", "M", "Y", "R",
+            "W");
     private Group currentGroup;
     private final EnumMap<Group, Set<String>> gr2filters = new EnumMap<Group, Set<String>>(Group.class);
+    private final List<HTMLToggle> togConsonants = new ArrayList<HTMLToggle>();
+    private final List<HTMLToggle> togVowels = new ArrayList<HTMLToggle>();
 
     public AlphabetFilter() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -45,15 +54,30 @@ public class AlphabetFilter extends Composite {
 
     public void updateAlphabet(final Group group) {
         currentGroup = group;
-        container.clear();
+        containerVowels.clear();
+        containerConsonants.clear();
+        togVowels.clear();
+        togConsonants.clear();
 
         if (isJapanese(group)) {
-            for (final String letter : JAPANESE_FILTERS) {
-                container.add(new HTMLToggle(letter));
+            for (final String letter : JAPANESE_FILTER_VOWELS) {
+                final HTMLToggle togVowel = new HTMLToggle(letter, true);
+                containerVowels.add(togVowel);
+                togVowels.add(togVowel);
+            }
+            for (final String letter : JAPANESE_FILTER_CONSONANTS) {
+                final HTMLToggle togConsonant = new HTMLToggle(letter);
+                containerConsonants.add(togConsonant);
+                togConsonants.add(togConsonant);
             }
         }
 
         final Set<String> filters = gr2filters.get(group);
+        selectFilters(filters, containerConsonants);
+        selectFilters(filters, containerVowels);
+    }
+
+    private static void selectFilters(final Set<String> filters, final HTMLPanel container) {
         for (int i = 0; i < container.getWidgetCount(); i++) {
             final HTMLToggle btn = (HTMLToggle) container.getWidget(i);
             if (filters.contains(btn.getText())) {
@@ -67,14 +91,21 @@ public class AlphabetFilter extends Composite {
     }
 
     public class HTMLToggle extends HTML {
-        private boolean isSelected = false;
+        public boolean isSelected = false;
+        private boolean isVowel = false;
 
         private HTMLToggle(final String html) {
+            this(html, false);
+        }
+
+        private HTMLToggle(final String html, final boolean isVowel) {
             super(html);
+            this.isVowel = isVowel;
             setWidth("15px");
-            getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-            getElement().getStyle().setCursor(Cursor.POINTER);
-            getElement().getStyle().setProperty("border", "1px solid black");
+            final Style style = getElement().getStyle();
+            style.setDisplay(Display.INLINE_BLOCK);
+            style.setCursor(Cursor.POINTER);
+            style.setProperty("border", "1px solid black");
 
             addClickHandler(new ClickHandler() {
 
@@ -87,20 +118,38 @@ public class AlphabetFilter extends Composite {
                     }
                 }
 
-                private void deselect() {
-                    getElement().getStyle().setBackgroundColor("white");
-                    gr2filters.get(currentGroup).remove(getText());
-                    isSelected = false;
-                }
             });
+        }
+
+        public void deselect() {
+            getElement().getStyle().setBackgroundColor("white");
+            gr2filters.get(currentGroup).remove(getText());
+            isSelected = false;
         }
 
         public void select() {
             getElement().getStyle().setBackgroundColor("lightgrey");
             gr2filters.get(currentGroup).add(getText());
             isSelected = true;
+            if (isVowel) {
+                for (final HTMLToggle conso : togConsonants) {
+                    if (conso.isSelected) {
+                        conso.deselect();
+                    }
+                }
+            } else {
+                for (final HTMLToggle vow : togVowels) {
+                    if (vow.isSelected) {
+                        vow.deselect();
+                    }
+                }
+            }
         }
 
+    }
+
+    public List<String> getFilters() {
+        return new ArrayList<String>(gr2filters.get(currentGroup));
     }
 
 }

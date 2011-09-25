@@ -8,15 +8,17 @@ import com.pgu.shared.Symbol.Group;
 
 public class GameConfig implements IsSerializable {
     public Group group;
-    public int size;
-    public List<String> vowels = new ArrayList<String>();
-    public List<String> consonants = new ArrayList<String>();
+    // public int size;
+    public List<String> filters = new ArrayList<String>();
+
+    // public List<String> vowels = new ArrayList<String>();
+    // public List<String> consonants = new ArrayList<String>();
 
     @Override
     public String toString() {
-        return "GameConfig [group=" + group + ", size=" + size + //
-                ", vowels=" + toStr(vowels) + //
-                ", consonants=" + toStr(consonants) + //
+        return "GameConfig [group=" + group + //
+                ", filters=" + toStr(filters) + //
+                // ", consonants=" + toStr(consonants) + //
                 "]";
     }
 
