@@ -8,10 +8,6 @@ import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -23,8 +19,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.pgu.client.app.AsyncCallbackApp;
 import com.pgu.client.presenter.GamePresenter;
 import com.pgu.client.presenter.LoginPresenter;
+import com.pgu.client.presenter.OptionsPresenter;
 import com.pgu.client.presenter.ResetPresenter;
 import com.pgu.client.presenter.ScorePresenter;
+import com.pgu.client.presenter.StartPresenter;
 import com.pgu.client.rpc.GameService;
 import com.pgu.client.rpc.GameServiceAsync;
 import com.pgu.client.rpc.LoginService;
@@ -47,17 +45,14 @@ import com.pgu.shared.UserAccount;
 import com.pgu.shared.UserAccount.ProviderAuth;
 
 public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, LoginPresenter, ScorePresenter,
-        ResetPresenter, GamePresenter {
+        ResetPresenter, GamePresenter, OptionsPresenter, StartPresenter {
 
-    // private final InitServiceAsync initService = GWT.create(InitService.class);
     private final GameServiceAsync gameService = GWT.create(GameService.class);
     private final LoginServiceAsync loginService = GWT.create(LoginService.class);
     private final PlayerServiceAsync playerService = GWT.create(PlayerService.class);
 
-    private final FlowPanel mainArea = new FlowPanel();
     private final GameBoard gameBoard = new GameBoard();
     private final OptionsMenu menuOptions = new OptionsMenu();
-    private final FlowPanel noticeArea = new FlowPanel();
 
     private final OptionsButton btnOptions = new OptionsButton();
     private final ResetButton btnReset = new ResetButton();
@@ -67,31 +62,10 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
     private final ScoreMenu menuScore = new ScoreMenu();
     private final LoginButton btnLogin = new LoginButton();
 
-    // private int N = 4;
+    private final FlowPanel mainArea = new FlowPanel();
+    private final FlowPanel noticeArea = new FlowPanel();
 
-    // final PopupPanel popupSuccess = new PopupPanel(true);
-    // final ListBox group = new ListBox();
-    // final ListBox gameSize = new ListBox();
-    // final ListBox vowels = new ListBox(true);
-    // final ListBox consonants = new ListBox(true);
-    // final Button btnInitGame = new Button("initGame");
-    // final Button btnResetGame = new Button("resetGame");
-    // final FlexTable ft = new FlexTable();
-    // final Button btnDeleteData = new Button("deleteData");
-    // final Button btnInitData = new Button("initData");
-
-    // final FlexTable ftDebug = new FlexTable();
-    // Label timeSpent = new Label("00:00");
-    // Label playerScore;
-
-    // final HorizontalPanel hp = new HorizontalPanel();
-    // final DisclosurePanel adminPanel = new DisclosurePanel("Admin");
-    // FlowPanel playerPanel;
-    // FlowPanel loginPanel;
-
-    // final Button btnFacebook = new Button("Facebook");
-    // final Button btnGoogle = new Button("Google");
-    // final Button btnTwitter = new Button("Twitter");
+    private UserAccount player;
 
     @Override
     public void onModuleLoad() {
@@ -99,89 +73,24 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
         menuScore.setPresenter(this);
         btnReset.setPresenter(this);
         gameBoard.setPresenter(this);
+        btnOptions.setPresenter(this);
+        btnStart.setPresenter(this);
+
         getLoggedInUser();
 
-        // final VerticalPanel vp = new VerticalPanel();
-        // vp.add(btnInitGame);
-        // vp.add(group);
-        // vp.add(gameSize);
-        //
-        // final HorizontalPanel hpFilters = new HorizontalPanel();
-        // hpFilters.add(vowels);
-        // hpFilters.add(consonants);
-        // vp.add(hpFilters);
-        // vp.add(btnResetGame);
-        //
-        // final FlowPanel fp2 = new FlowPanel();
-        // fp2.add(ft);
-        // fp2.add(timeSpent);
-        //
-        // hp.add(fp2);
-        // hp.add(vp);
-        // hp.add(ftDebug);
-        //
-        // hp.setSpacing(20);
-        //
-        // RootPanel.get().add(hp);
-        // addSeparator();
-        //
-        // formatBoard();
-        //
-        // addAdminMenu();
-        // setActionInitData();
-        // setActionDeleteData();
-
-        // setActionInitGame();
-        // setActionResetGame();
-
-        // setSelectionGroup();
-        // setSelectionGameSize();
-        // setSelectionVowels();
-        // setSelectionConsonants();
-
-        // popupSuccess.add(new Label("Bravo, you win!"));
-
-        // final Style styleTS = timeSpent.getElement().getStyle();
-        // styleTS.setProperty("marginLeft", "auto");
-        // styleTS.setProperty("marginRight", "auto");
-        // styleTS.setWidth(30, Unit.PX);
-        // /////////////////////////////////////////////////////////////
         UiHelper.id("mainArea", mainArea);
         UiHelper.id("noticeArea", noticeArea);
 
         RootPanel.get().add(mainArea);
         mainArea.add(menuOptions);
         mainArea.add(gameBoard);
-
         RootPanel.get().add(noticeArea);
-
         RootPanel.get().add(btnLogin);
         RootPanel.get().add(btnStart);
         RootPanel.get().add(btnReset);
         RootPanel.get().add(btnOptions);
-
         RootPanel.get().add(menuLogin);
 
-        btnLogin.addDomHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                menuLogin.setVisible(!menuLogin.isVisible());
-                final Style style = menuLogin.getElement().getStyle();
-                style.setTop(btnLogin.getAbsoluteTop() - menuLogin.getOffsetHeight(), Unit.PX);
-                style.setLeft(btnLogin.getAbsoluteLeft(), Unit.PX);
-            }
-        }, ClickEvent.getType());
-
-        btnOptions.addDomHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(final ClickEvent event) {
-                History.newItem(!menuOptions.isVisible() ? "options" : "game");
-            }
-        }, ClickEvent.getType());
-
-        // history mng
         final String initToken = History.getToken();
         if (initToken.length() == 0) {
             History.newItem("game");
@@ -189,53 +98,6 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
         History.addValueChangeHandler(this);
         History.fireCurrentHistoryState();
     }
-
-    // private void addPlayerPanel() {
-    // playerPanel = new FlowPanel();
-    // playerPanel.add(new InlineLabel("Account: "));
-    //
-    // final InlineLabel playerName = new InlineLabel();
-    // playerPanel.add(playerName);
-    //
-    // final Label playerProvider = new Label();
-    // playerPanel.add(playerProvider);
-    //
-    // playerPanel.add(new InlineLabel("Score: "));
-    //
-    // playerScore = new Label();
-    // playerPanel.add(playerScore);
-    //
-    // final Button btnLogout = new Button("logout");
-    // playerPanel.add(btnLogout);
-    //
-    // hp.add(playerPanel);
-    // setActionLogout(btnLogout);
-    //
-    // playerName.setText(user.getName());
-    // playerProvider.setText(user.getProviderAuth().toString());
-    // }
-
-    // private void addLoginPanel() {
-    // loginPanel = new FlowPanel();
-    // loginPanel.add(btnFacebook);
-    // loginPanel.add(btnGoogle);
-    // loginPanel.add(btnTwitter);
-    // hp.add(loginPanel);
-    //
-    // setActionLoginFacebook();
-    // setActionLoginGoogle();
-    // setActionLoginTwitter();
-    // }
-
-    // private void addAdminMenu() {
-    // final FlowPanel fpAdmin = new FlowPanel();
-    // fpAdmin.add(btnDeleteData);
-    // fpAdmin.add(btnInitData);
-    // adminPanel.add(fpAdmin);
-    // hp.add(adminPanel);
-    // }
-
-    private UserAccount user;
 
     private void getLoggedInUser() {
         loginService.getLoggedInUser(new AsyncCallbackApp<UserAccount>() {
@@ -253,56 +115,16 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
     }
 
     private void showLoginView() {
+        player = null;
         btnLogin.showLogin();
-        // addLoginPanel();
-        // adminPanel.setVisible(false);
-        // if (null != playerPanel) {
-        // playerPanel.removeFromParent();
-        // }
     }
 
-    // private void setActionLoginFacebook() {
-    // btnFacebook.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // Window.Location.assign("/loginfacebook");
-    // }
-    // });
-    // }
-    //
-    // private void setActionLoginGoogle() {
-    // btnGoogle.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // Window.Location.assign("/logingoogle");
-    // }
-    // });
-    // }
-    //
-    // private void setActionLoginTwitter() {
-    // btnTwitter.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // Window.Location.assign("/logintwitter");
-    // }
-    // });
-    // }
-    //
     private void goAfterLogin(final UserAccount loggedInUser) {
-        user = loggedInUser;
+        player = loggedInUser;
 
-        btnLogin.showUser(user);
-        // if (null != loginPanel) {
-        // loginPanel.removeFromParent();
-        // }
-        // addPlayerPanel();
+        btnLogin.showUser(player);
 
-        // adminPanel.setVisible(false);
-
-        playerService.getScore(user, new AsyncCallbackApp<Integer>() {
+        playerService.getScore(player, new AsyncCallbackApp<Integer>() {
 
             @Override
             public void onSuccess(final Integer result) {
@@ -311,141 +133,9 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
         });
     }
 
-    // private void setActionLogout(final Button btnLogout) {
-    // btnLogout.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // if (ProviderAuth.FACEBOOK == user.getProviderAuth()) {
-    // Window.Location.assign("/facebooklogout.jsp");
-    // } else {
-    // loginService.logout(new AsyncCallbackApp<Void>() {
-    //
-    // @Override
-    // public void onSuccess(final Void result) {
-    // GWT.log("logout");
-    // showLoginView();
-    // }
-    // });
-    // }
-    // }
-    // });
-    // }
-    //
-    // private void setActionResetGame() {
-    // btnResetGame.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // resetGameFlags();
-    // resetUI();
-    // }
-    //
-    // });
-    // }
-
-    private void resetUI() {
-        gameBoard.reset();
-        // timeSpent.setText("00:00");
-        // for (int row = 0; row < N; row++) {
-        // for (int col = 0; col < N; col++) {
-        // final FlowPanelCard fpc = (FlowPanelCard) ft.getWidget(row, col);
-        // fpc.label.setHTML("");
-        // final Style style = fpc.getElement().getStyle();
-        // style.setBackgroundColor("limegreen");
-        // }
-        // }
-    }
-
-    // private void addSeparator() {
-    // final HTML sp = new HTML("");
-    // sp.setHeight("5px");
-    // RootPanel.get().add(sp);
-    // }
-    //
-    // private void setSelectionConsonants() {
-    // consonants.addItem("");
-    // consonants.addItem("-");
-    // consonants.addItem("K");
-    // consonants.addItem("S");
-    // consonants.addItem("T");
-    // consonants.addItem("N");
-    // consonants.addItem("H");
-    // consonants.addItem("M");
-    // consonants.addItem("Y");
-    // consonants.addItem("R");
-    // consonants.addItem("W");
-    // consonants.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // for (int i = 0; i < vowels.getItemCount(); i++) {
-    // vowels.setItemSelected(i, false);
-    // }
-    // }
-    // });
-    // consonants.setHeight("100px");
-    // }
-
-    // private void setSelectionVowels() {
-    // vowels.addItem("");
-    // vowels.addItem("A");
-    // vowels.addItem("E");
-    // vowels.addItem("I");
-    // vowels.addItem("O");
-    // vowels.addItem("U");
-    // vowels.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // for (int i = 0; i < consonants.getItemCount(); i++) {
-    // consonants.setItemSelected(i, false);
-    // }
-    // }
-    // });
-    // vowels.setHeight("100px");
-    // }
-
-    // private void setSelectionGroup() {
-    // for (final Group gr : Symbol.Group.values()) {
-    // group.addItem(gr.toString());
-    // }
-    // group.addChangeHandler(new ChangeHandler() {
-    //
-    // @Override
-    // public void onChange(final ChangeEvent event) {
-    // final Group gr = Group.valueOf(group.getItemText(group.getSelectedIndex()));
-    // final boolean isJapanese = isJapanese(gr);
-    // vowels.setVisible(isJapanese);
-    // consonants.setVisible(isJapanese);
-    // }
-    //
-    // private boolean isJapanese(final Group gr) {
-    // return gr == Group.HIRAGANA || gr == Group.KATAKANA;
-    // }
-    // });
-    // }
-
-    // private void setSelectionGameSize() {
-    // gameSize.addItem("2");
-    // gameSize.addItem("4");
-    // gameSize.addItem("6");
-    // gameSize.setSelectedIndex(1);
-    // }
-
-    // private void setActionInitGame() {
-    // btnInitGame.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // initGame();
-    // }
-    //
-    // });
-    // }
-
-    int seconds = 0;
-    Timer timerSeconds = new Timer() {
+    private boolean isGameOn = false;
+    private int seconds = 0;
+    private final Timer timerSeconds = new Timer() {
 
         @Override
         public void run() {
@@ -455,17 +145,12 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
 
     };
 
-    boolean isGameOn = false;
-
-    private void initGame() {
+    @Override
+    public void start() {
         resetGameFlags();
 
         final GameConfig gc = new GameConfig();
         gc.group = menuOptions.getCurrentGroup();
-        // setConfigGroup(gc);
-        // setConfigSize(gc);
-        // setConfigVowels(gc);
-        // setConfigConsonants(gc);
         gc.filters.clear();
         gc.filters.addAll(menuOptions.getFilters());
 
@@ -473,8 +158,6 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
 
             @Override
             public void onSuccess(final List<Symbol> symbols) {
-                // formatBoard();
-
                 resetGame();
 
                 nbSymbolsToFind = symbols.size();
@@ -512,107 +195,7 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
     }
 
     private final List<Symbol> symbolIngames = new ArrayList<Symbol>();
-
-    // private void formatFtDebug(final List<Symbol> symbols) {
-    // ftDebug.clear();
-    // int row = 0;
-    // for (final Symbol symbol : symbols) {
-    // ftDebug.setWidget(row, 0, new HTML(symbol.getAlpha()));
-    // ftDebug.setWidget(row++, 1, new HTML(symbol.getUnicode()));
-    // }
-    // }
-
-    // private void setConfigConsonants(final GameConfig gc) {
-    // for (int i = 1; i < consonants.getItemCount(); i++) {
-    // if (consonants.isItemSelected(i)) {
-    // gc.consonants.add(consonants.getValue(i));
-    // }
-    // }
-    // }
-    //
-    // private void setConfigVowels(final GameConfig gc) {
-    // for (int i = 1; i < vowels.getItemCount(); i++) {
-    // if (vowels.isItemSelected(i)) {
-    // gc.vowels.add(vowels.getValue(i));
-    // }
-    // }
-    // }
-
-    // private void setConfigSize(final GameConfig gc) {
-    // final int selectedIndex = gameSize.getSelectedIndex();
-    // if (isNothingSelected(selectedIndex)) {
-    // N = 4;
-    // } else {
-    // N = Integer.parseInt(gameSize.getItemText(selectedIndex));
-    // }
-    // gc.size = N * N;
-    // }
-    //
-    // private void setConfigGroup(final GameConfig gc) {
-    // final int selectedIndex = group.getSelectedIndex();
-    // if (isNothingSelected(selectedIndex)) {
-    // gc.group = Group.HIRAGANA;
-    // } else {
-    // gc.group = Group.valueOf(group.getItemText(selectedIndex));
-    // }
-    // }
-    //
-    // private boolean isNothingSelected(final int selectedIndex) {
-    // return selectedIndex == -1;
-    // }
-
-    // private void setActionDeleteData() {
-    // btnDeleteData.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // initService.deleteData(new AsyncCallbackApp<Void>() {
-    //
-    // @Override
-    // public void onSuccess(final Void result) {
-    // GWT.log("clean data is done");
-    // }
-    // });
-    // }
-    // });
-    // }
-
-    // private void setActionInitData() {
-    // btnInitData.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // btnInitData.setEnabled(false);
-    // initService.initData(new AsyncCallbackApp<Void>() {
-    //
-    // @Override
-    // public void onSuccess(final Void result) {
-    // GWT.log("init is done");
-    // }
-    // });
-    // }
-    // });
-    // }
-
-    // private void formatBoard() {
-    // ft.clear();
-    // int index = 0;
-    // for (int row = 0; row < N; row++) {
-    // for (int col = 0; col < N; col++) {
-    //
-    // final FlowPanelCard cellFormat = new FlowPanelCard(index++, this);
-    // final Style style = cellFormat.getElement().getStyle();
-    // style.setBackgroundColor("limegreen");
-    // style.setWidth(25, Unit.PX);
-    // style.setHeight(25, Unit.PX);
-    //
-    // ft.setWidget(row, col, cellFormat);
-    //
-    // }
-    // }
-    // }
-
-    final Map<RowCol, HalfPair> rowCol2HalfPair = new HashMap<RowCol, HalfPair>();
+    private final Map<RowCol, HalfPair> rowCol2HalfPair = new HashMap<RowCol, HalfPair>();
 
     public static class HalfPair {
         private final String value;
@@ -715,33 +298,15 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
 
     }
 
-    // public class FlowPanelCard extends FlowPanel {
-    //
-    // private final HTML label = new HTML();
-    // private final int index;
-    //
-    // public FlowPanelCard(final int index, final Pgu_languages board) {
-    // this.index = index;
-    // add(label);
-    //
-    // addDomHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(final ClickEvent event) {
-    // board.isCellClicked(FlowPanelCard.this);
-    // }
-    // }, ClickEvent.getType());
-    //
-    // }
-    // }
-    //
-    HalfPair S1;
-    HalfPair S2;
+    private HalfPair S1;
+    private HalfPair S2;
 
-    Card fpcS1;
-    Card fpcS2;
+    private Card fpcS1;
+    private Card fpcS2;
 
-    Timer t = new Timer() {
+    private int nbSymbolsToFind = 0;
+
+    private final Timer t = new Timer() {
 
         @Override
         public void run() {
@@ -749,9 +314,6 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
         }
     };
 
-    int nbSymbolsToFind = 0;
-
-    // protected void isCellClicked(final FlowPanelCard flowPanelCard) {
     protected void isCellClicked(final Card card) {
         if (isGameOn) {
 
@@ -794,8 +356,6 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
                 resetGameFlags();
                 // TODO PGU
                 Window.alert("Success");
-                // popupSuccess.show();
-                // popupSuccess.center();
             }
         }
     }
@@ -831,6 +391,7 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
             gameBoard.setVisible(false);
             menuOptions.setVisible(true);
         }
+        // TODO PGU help view, score view
     }
 
     @Override
@@ -845,7 +406,7 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
 
     @Override
     public void logout() {
-        if (ProviderAuth.FACEBOOK == user.getProviderAuth()) {
+        if (ProviderAuth.FACEBOOK == player.getProviderAuth()) {
             Window.Location.assign("/facebooklogout.jsp");
         } else {
             loginService.logout(new AsyncCallbackApp<Void>() {
@@ -861,7 +422,7 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
     @Override
     public void resetGame() {
         resetGameFlags();
-        resetUI();
+        gameBoard.reset();
     }
 
     @Override
@@ -879,6 +440,11 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String>, Lo
     @Override
     public void clicks(final Card card) {
         isCellClicked(card);
+    }
+
+    @Override
+    public void toggleOptionsMenu() {
+        History.newItem(!menuOptions.isVisible() ? "options" : "game");
     }
 
 }

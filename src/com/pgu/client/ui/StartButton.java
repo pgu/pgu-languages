@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.pgu.client.presenter.StartPresenter;
 
 public class StartButton extends Composite {
 
@@ -22,6 +23,12 @@ public class StartButton extends Composite {
     @UiField
     HTML start;
 
+    private StartPresenter presenter;
+
+    public void setPresenter(final StartPresenter presenter) {
+        this.presenter = presenter;
+    }
+
     public StartButton() {
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -32,8 +39,7 @@ public class StartButton extends Composite {
 
             @Override
             public void onClick(final ClickEvent event) {
-                GWT.log("start...");
-                // TODO PGU turn on the cards
+                presenter.start();
             }
         }, ClickEvent.getType());
     }

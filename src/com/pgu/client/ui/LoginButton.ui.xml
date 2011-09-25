@@ -3,7 +3,7 @@
     xmlns:pgu="urn:import:com.pgu.client.ui" >
 
         <g:HTMLPanel ui:field="container">
-            <g:HTML ui:field="login" text="Login"></g:HTML>
+            <g:HTML ui:field="login"></g:HTML>
         </g:HTMLPanel>
     
 </ui:UiBinder> 

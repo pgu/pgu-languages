@@ -29,16 +29,15 @@ public class LoginButton extends Composite {
 
     private LoginPresenter presenter;
 
+    public void setPresenter(final LoginPresenter presenter) {
+        this.presenter = presenter;
+    }
+
     public LoginButton() {
         initWidget(uiBinder.createAndBindUi(this));
 
         UiHelper.id("container-login-btn", container);
         UiHelper.id("login-btn", login);
-
-    }
-
-    public void setPresenter(final LoginPresenter presenter) {
-        this.presenter = presenter;
     }
 
     private HandlerRegistration loginHandler = null;
