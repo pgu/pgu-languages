@@ -1,7 +1,9 @@
 package com.pgu.client.ui;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
@@ -27,6 +29,11 @@ public class AlphabetFilter extends Composite {
     @UiField
     HTMLPanel container;
 
+    private static List<String> JAPANESE_FILTERS = Arrays.asList("A", "E", "I", "O", "U", "K", "S", "T", "N", "H", "M",
+            "Y", "R", "W");
+    private Group currentGroup;
+    private final EnumMap<Group, Set<String>> gr2filters = new EnumMap<Group, Set<String>>(Group.class);
+
     public AlphabetFilter() {
         initWidget(uiBinder.createAndBindUi(this));
         UiHelper.id("container-alphabet-filter", container);
@@ -36,28 +43,14 @@ public class AlphabetFilter extends Composite {
         gr2filters.put(Group.RUSSIAN, new HashSet<String>());
     }
 
-    private Group currentGroup;
-
     public void updateAlphabet(final Group group) {
         currentGroup = group;
         container.clear();
 
         if (isJapanese(group)) {
-            container.add(new HTMLToggle("A"));
-            container.add(new HTMLToggle("E"));
-            container.add(new HTMLToggle("I"));
-            container.add(new HTMLToggle("O"));
-            container.add(new HTMLToggle("U"));
-
-            container.add(new HTMLToggle("K"));
-            container.add(new HTMLToggle("S"));
-            container.add(new HTMLToggle("T"));
-            container.add(new HTMLToggle("N"));
-            container.add(new HTMLToggle("H"));
-            container.add(new HTMLToggle("M"));
-            container.add(new HTMLToggle("Y"));
-            container.add(new HTMLToggle("R"));
-            container.add(new HTMLToggle("W"));
+            for (final String letter : JAPANESE_FILTERS) {
+                container.add(new HTMLToggle(letter));
+            }
         }
 
         final Set<String> filters = gr2filters.get(group);
@@ -68,8 +61,6 @@ public class AlphabetFilter extends Composite {
             }
         }
     }
-
-    private final EnumMap<Group, Set<String>> gr2filters = new EnumMap<Group, Set<String>>(Group.class);
 
     private static boolean isJapanese(final Group gr) {
         return gr == Group.HIRAGANA || gr == Group.KATAKANA;

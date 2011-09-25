@@ -39,6 +39,7 @@ import com.pgu.client.rpc.LoginService;
 import com.pgu.client.rpc.LoginServiceAsync;
 import com.pgu.client.rpc.PlayerService;
 import com.pgu.client.rpc.PlayerServiceAsync;
+import com.pgu.client.ui.GameBoard;
 import com.pgu.client.ui.LoginButton;
 import com.pgu.client.ui.LoginMenu;
 import com.pgu.client.ui.OptionsButton;
@@ -133,10 +134,9 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String> {
         styleTS.setProperty("marginLeft", "auto");
         styleTS.setProperty("marginRight", "auto");
         styleTS.setWidth(30, Unit.PX);
-
+        // /////////////////////////////////////////////////////////////
         UiHelper.id("mainArea", mainArea);
         UiHelper.id("noticeArea", noticeArea);
-        UiHelper.id("gameBoard", gameBoard);
 
         RootPanel.get().add(mainArea);
         mainArea.add(menuOptions);
@@ -180,7 +180,7 @@ public class Pgu_languages implements EntryPoint, ValueChangeHandler<String> {
     }
 
     FlowPanel mainArea = new FlowPanel();
-    FlowPanel gameBoard = new FlowPanel();
+    GameBoard gameBoard = new GameBoard();
     OptionsMenu menuOptions = new OptionsMenu();
     FlowPanel noticeArea = new FlowPanel();
 
