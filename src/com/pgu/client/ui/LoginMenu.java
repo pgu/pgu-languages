@@ -29,6 +29,7 @@ public class LoginMenu extends Composite {
 
     public LoginMenu() {
         initWidget(uiBinder.createAndBindUi(this));
+        container.setVisible(false);
 
         UiHelper.id("container-login-menu", container);
         UiHelper.id("facebook", facebook);

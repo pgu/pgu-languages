@@ -13,6 +13,9 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -36,14 +39,20 @@ import com.pgu.client.rpc.LoginService;
 import com.pgu.client.rpc.LoginServiceAsync;
 import com.pgu.client.rpc.PlayerService;
 import com.pgu.client.rpc.PlayerServiceAsync;
-import com.pgu.client.ui.Menu;
+import com.pgu.client.ui.LoginButton;
+import com.pgu.client.ui.LoginMenu;
+import com.pgu.client.ui.OptionsButton;
+import com.pgu.client.ui.OptionsMenu;
+import com.pgu.client.ui.StartButton;
+import com.pgu.client.ui.StopButton;
+import com.pgu.client.ui.UiHelper;
 import com.pgu.shared.GameConfig;
 import com.pgu.shared.Symbol;
 import com.pgu.shared.Symbol.Group;
 import com.pgu.shared.UserAccount;
 import com.pgu.shared.UserAccount.ProviderAuth;
 
-public class Pgu_languages implements EntryPoint {
+public class Pgu_languages implements EntryPoint, ValueChangeHandler<String> {
 
     InitServiceAsync initService = GWT.create(InitService.class);
     GameServiceAsync gameService = GWT.create(GameService.class);
@@ -125,8 +134,62 @@ public class Pgu_languages implements EntryPoint {
         styleTS.setProperty("marginRight", "auto");
         styleTS.setWidth(30, Unit.PX);
 
-        RootPanel.get().add(new Menu());
+        UiHelper.id("mainArea", mainArea);
+        UiHelper.id("noticeArea", noticeArea);
+        UiHelper.id("gameBoard", gameBoard);
+
+        RootPanel.get().add(mainArea);
+        mainArea.add(menuOptions);
+        mainArea.add(gameBoard);
+
+        RootPanel.get().add(noticeArea);
+
+        RootPanel.get().add(btnLogin);
+        RootPanel.get().add(btnStart);
+        RootPanel.get().add(btnStop);
+        RootPanel.get().add(btnOptions);
+
+        RootPanel.get().add(menuLogin);
+
+        btnLogin.addDomHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                menuLogin.setVisible(!menuLogin.isVisible());
+                final Style style = menuLogin.getElement().getStyle();
+                style.setTop(btnLogin.getAbsoluteTop() - menuLogin.getOffsetHeight(), Unit.PX);
+                style.setLeft(btnLogin.getAbsoluteLeft(), Unit.PX);
+            }
+        }, ClickEvent.getType());
+
+        btnOptions.addDomHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+                History.newItem(!menuOptions.isVisible() ? "options" : "game");
+            }
+        }, ClickEvent.getType());
+
+        // history mng
+        final String initToken = History.getToken();
+        if (initToken.length() == 0) {
+            History.newItem("game");
+        }
+        History.addValueChangeHandler(this);
+        History.fireCurrentHistoryState();
     }
+
+    FlowPanel mainArea = new FlowPanel();
+    FlowPanel gameBoard = new FlowPanel();
+    OptionsMenu menuOptions = new OptionsMenu();
+    FlowPanel noticeArea = new FlowPanel();
+
+    OptionsButton btnOptions = new OptionsButton();
+    StopButton btnStop = new StopButton();
+    StartButton btnStart = new StartButton();
+
+    LoginMenu menuLogin = new LoginMenu();
+    LoginButton btnLogin = new LoginButton();
 
     private void addPlayerPanel() {
         playerPanel = new FlowPanel();
@@ -745,6 +808,18 @@ public class Pgu_languages implements EntryPoint {
             S1 = halfPair;
             flowPanelCard.label.setHTML(S1.value);
             fpcS1 = flowPanelCard;
+        }
+    }
+
+    @Override
+    public void onValueChange(final ValueChangeEvent<String> event) {
+        final String token = event.getValue();
+        if ("game".equals(token)) {
+            gameBoard.setVisible(true);
+            menuOptions.setVisible(false);
+        } else if ("options".equals(token)) {
+            gameBoard.setVisible(false);
+            menuOptions.setVisible(true);
         }
     }
 

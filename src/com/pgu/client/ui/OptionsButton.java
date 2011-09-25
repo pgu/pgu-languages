@@ -23,10 +23,9 @@ public class OptionsButton extends Composite {
     public OptionsButton() {
         initWidget(uiBinder.createAndBindUi(this));
 
-        UiHelper.id("container-options", container);
-        UiHelper.id("options", options);
+        UiHelper.id("container-options-btn", container);
+        UiHelper.id("options-btn", options);
 
-        // TODO PGU alphabet, filtres
     }
 
 }
