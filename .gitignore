@@ -2,6 +2,7 @@
 .classpath
 .settings/
 .gwt/
+gwt-unitCache/
 .settings/com.google.gwt.eclipse.core.prefs
 war/WEB-INF/classes/
 war/WEB-INF/lib/
